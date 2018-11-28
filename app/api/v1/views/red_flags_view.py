@@ -78,3 +78,41 @@ class EditComment(Resource, Incidences):
         self.update_record(**data)
 
         return jsonify({"message": "Updated red-flag record's comment", "status": 200})
+
+class EditLocation(Resource, Incidences):
+    def __init__(self):
+        pass
+
+    def patch(self, records_id):
+        """updates Location record data"""
+        record = self.get_one_record(records_id)
+
+        if len(record) == 0:
+            return jsonify({"message": "No record with this ID", "status": 404})
+
+        data = request.get_json()
+
+        location = data['location']
+
+        index = self.get_index(records_id)
+
+        data = {
+            "comment": location,
+            "index": index
+        }
+
+        self.update_record(**data)
+
+        return jsonify(
+            {
+                "status": 200,
+                "data":[
+                    {
+                        "id": records_id,
+                        "message": "Updated red-flag record's Location"
+
+                    }
+                ]
+                
+                }
+            )
