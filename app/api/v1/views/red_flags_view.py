@@ -28,3 +28,15 @@ class Records(Resource, Incidences):
         if len(resp) == 0:
             return jsonify({"message": "There are no records available", "status": 200})
         return jsonify({"data": resp, "status": 200})
+
+class OneRecord(Resource, Incidences):
+    def __init__(self):
+        # self.db = Incidences()
+        pass
+
+    def get(self, records_id):
+        record = self.get_one_record(records_id)
+        if len(record) == 0:
+            return jsonify({"message": "There is no record wit this ID", "status": 404})
+        else:
+            return jsonify({"Record data": record, "status": 200})

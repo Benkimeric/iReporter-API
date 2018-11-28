@@ -29,3 +29,9 @@ class Incidences():
         """get all the records"""
 
         return records_list
+
+    def get_one_record(self, record_id):
+        """get one record"""
+
+        record = [record for record in records_list if record["record_id"] == record_id]
+        return record
