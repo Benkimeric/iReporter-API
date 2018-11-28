@@ -40,3 +40,13 @@ class OneRecord(Resource, Incidences):
             return jsonify({"message": "There is no record wit this ID", "status": 404})
         else:
             return jsonify({"Record data": record, "status": 200})
+
+    def delete(self, records_id):
+        """Delete a record"""
+        record = self.get_one_record(records_id)
+        if len(record) == 0:
+            return jsonify({"message": "No record with this ID", "status": 404})
+
+        records_list.remove(record[0])
+
+        return jsonify({"message": "Red-flag record has been deleted", "status": 200})
