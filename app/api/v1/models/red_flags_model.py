@@ -23,7 +23,10 @@ class Incidences():
 
         self.incident.append(data)
 
-        return self.incident
+        #return the whole list
+        # return self.incident
+        #return new data
+        return data
 
     def get_all_records(self):
         """get all the records"""
@@ -35,3 +38,23 @@ class Incidences():
 
         record = [record for record in records_list if record["record_id"] == record_id]
         return record
+
+    def update_record(self, comment, index):
+        """Edit existing record"""
+
+        data = comment
+
+        for comment in records_list:
+            records_list[index]['comment'] = data
+            # return records_list
+
+    def get_index(self, records_id):
+        """Get index position of a record"""
+
+        index = 0
+        for record in records_list:
+            if record["record_id"] == records_id:
+                return index
+            index += 1
+
+        return index

@@ -29,6 +29,7 @@ class Records(Resource, Incidences):
             return jsonify({"message": "There are no records available", "status": 200})
         return jsonify({"data": resp, "status": 200})
 
+
 class OneRecord(Resource, Incidences):
     def __init__(self):
         # self.db = Incidences()
@@ -50,3 +51,30 @@ class OneRecord(Resource, Incidences):
         records_list.remove(record[0])
 
         return jsonify({"message": "Red-flag record has been deleted", "status": 200})
+
+
+class EditComment(Resource, Incidences):
+    def __init__(self):
+        pass
+
+    def patch(self, records_id):
+        """updates Record data"""
+        record = self.get_one_record(records_id)
+
+        if len(record) == 0:
+            return jsonify({"message": "No record with this ID", "status": 404})
+
+        data = request.get_json()
+
+        comment = data['comment']
+
+        index = self.get_index(records_id)
+
+        data = {
+            "comment": comment,
+            "index": index
+        }
+
+        self.update_record(**data)
+
+        return jsonify({"message": "Updated red-flag record's comment", "status": 200})
