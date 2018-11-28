@@ -22,3 +22,9 @@ class Records(Resource, Incidences):
 
         resp = self.db.save(created_by, record_type, location, comment)
         return jsonify({"data": resp, "message": "created red-flag record succeffuly", "status": 201})
+
+    def get(self):
+        resp = self.db.get_all_records()
+        if len(resp) == 0:
+            return jsonify({"message": "There are no records available", "status": 200})
+        return jsonify({"data": resp, "status": 200})

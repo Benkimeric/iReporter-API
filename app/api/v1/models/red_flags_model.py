@@ -7,7 +7,6 @@ class Incidences():
     def __init__(self):
         self.incident = records_list
 
-
     def save(self, created_by, record_type, location, comment):
         """"Method to save red-flags,def"""
         date = datetime.now().strftime("%Y-%m-%d %H:%M:S")
@@ -25,3 +24,8 @@ class Incidences():
         self.incident.append(data)
 
         return self.incident
+
+    def get_all_records(self):
+        """get all the records"""
+
+        return records_list
