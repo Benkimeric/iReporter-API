@@ -9,7 +9,7 @@ class Incidences():
 
     def save(self, created_by, record_type, location, comment):
         """"Method to save red-flags,def"""
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:S")
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         status = "Draft"
         data = {
             "record_id": len(self.incident)+1,
@@ -40,13 +40,21 @@ class Incidences():
         return record
 
     def update_record(self, comment, index):
-        """Edit existing record"""
+        """Edit existing record comment"""
 
         data = comment
 
         for comment in records_list:
             records_list[index]['comment'] = data
             # return records_list
+
+    def update_record_location(self, location, index):
+        """Edit existing record location"""
+
+        data = location
+
+        for location in records_list:
+            records_list[index]['location'] = data
 
     def get_index(self, records_id):
         """Get index position of a record"""
