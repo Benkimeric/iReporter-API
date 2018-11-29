@@ -8,7 +8,11 @@ python:
 install:
 - pip install -r requirements.txt
 - pip install codeclimate-test-reporter
- 
+- pip install coveralls codecov 
+
+- pip install pytest
+- pip install pytest-cov
+- pip install coveralls
 
 script:
 - pytest --cov-report term-missing --cov=app
