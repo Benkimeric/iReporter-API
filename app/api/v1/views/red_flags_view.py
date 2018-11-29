@@ -21,13 +21,29 @@ class Records(Resource, Incidences):
             return jsonify({"message": "You must provide a name", "status": 400})
 
         resp = self.db.save(created_by, record_type, location, comment)
-        return jsonify({"data": resp, "message": "created red-flag record succeffuly", "status": 201})
+        return jsonify(
+            {
+                "status": 201,
+                "data": [
+                    {
+                        "id": resp["record_id"],
+                        "message": "created red-flag record"
+
+                    }
+                ]
+            }
+        )
 
     def get(self):
         resp = self.db.get_all_records()
         if len(resp) == 0:
             return jsonify({"message": "There are no records available", "status": 200})
-        return jsonify({"data": resp, "status": 200})
+        return jsonify(
+            {
+                "status": 200,
+                "data": resp
+            }
+        )
 
 
 class OneRecord(Resource, Incidences):
@@ -50,7 +66,17 @@ class OneRecord(Resource, Incidences):
 
         records_list.remove(record[0])
 
-        return jsonify({"message": "Red-flag record has been deleted", "status": 200})
+        return jsonify(
+            {
+                "status": 200,
+                "data": [
+                    {
+                        "id": records_id,
+                        "message": "Red-flag record has been deleted"
+                    }
+                ]
+            }
+        )
 
 
 class EditComment(Resource, Incidences):
@@ -77,7 +103,17 @@ class EditComment(Resource, Incidences):
 
         self.update_record(**data)
 
-        return jsonify({"message": "Updated red-flag record's comment", "status": 200})
+        return jsonify(
+            {
+                "data": [
+                    {
+                        "status": 200,
+                        "message": "Updated red-flag record's comment"
+                    }
+                ]
+            }
+        )
+
 
 class EditLocation(Resource, Incidences):
     def __init__(self):
@@ -106,13 +142,13 @@ class EditLocation(Resource, Incidences):
         return jsonify(
             {
                 "status": 200,
-                "data":[
+                "data": [
                     {
                         "id": records_id,
                         "message": "Updated red-flag record's Location"
 
                     }
                 ]
-                
-                }
-            )
+
+            }
+        )
