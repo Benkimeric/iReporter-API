@@ -18,7 +18,7 @@ class Records(Resource, Incidences):
 
         # return make_response(jsonify({"My new Friend list": resp}), 201)
         if comment == "" or not comment:
-            return jsonify({"message": "You must provide a name", "status": 400})
+            return jsonify({"message": "Please fillall the required fields", "status": 400})
 
         resp = self.db.save(created_by, record_type, location, comment)
         return jsonify(
