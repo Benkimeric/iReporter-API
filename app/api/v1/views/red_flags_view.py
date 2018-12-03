@@ -1,5 +1,6 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask import jsonify, make_response, request
+import re
 
 # local import
 from ..models.red_flags_model import Incidences, records_list
@@ -16,9 +17,18 @@ class Records(Resource, Incidences):
         location = data['location']
         comment = data['comment']
 
-        # return make_response(jsonify({"My new Friend list": resp}), 201)
+        #validation of inputs
         if comment == "" or not comment:
             return {"message": "Please fill all the required fields", "status": 400}, 400
+
+        elif record_type != "red-flag" and record_type != "intervention":
+            return {"message": "Record type can only be a red-flag or an intervention", "status": 400}, 400
+
+        elif created_by.isdigit() is False:
+            return {"message": "Created by can only be a digit", "status": 400}, 400
+
+        elif not re.match(r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$", location):
+            return {"message": "Please ensure you have entered comma separated lat and long", "status": 400}, 400
 
         resp = self.db.save(created_by, record_type, location, comment)
         return {
@@ -122,6 +132,9 @@ class EditLocation(Resource, Incidences):
         data = request.get_json()
 
         location = data['location']
+
+        if not re.match(r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$", location):
+            return {"message": "Please ensure you have entered comma separated lat and long", "status": 400}, 400
 
         index = self.get_index(records_id)
 

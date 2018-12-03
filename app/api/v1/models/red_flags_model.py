@@ -31,7 +31,7 @@ class Incidences():
     def get_all_records(self):
         """get all the records"""
 
-        return records_list
+        return self.incident
 
     def get_one_record(self, record_id):
         """get one record"""

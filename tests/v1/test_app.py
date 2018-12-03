@@ -13,16 +13,19 @@ class Test(unittest.TestCase):
 
         self.app = create_app(config_name='testing')
         self.client = self.app.test_client()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
 
         self.data = {
-            "comment": "ben",
-            "created_by": "333",
-            "location": "'-34.397,150.644'",
-            "record_type": "onlycomment"
+            "comment": "new corruption",
+            "created_by": "2",
+            "record_type": "intervention",
+            "location": "10.0123, -34.034"
         }
 
-    # def tearDown(self):
-    #     records_list.clear()
+    def tearDown(self):
+        """Removes all initialised variables"""
+        self.app_context.pop()
 
     def test_it_creates_incident_records(self):
         """test if posts an incident record """
