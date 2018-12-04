@@ -20,6 +20,7 @@ Python / Flask
 | GET     | /api/v1/red-flags        | View All Incidences     |
 | POST     | /api/v1/red-flags        | Add an Incident Record      |
 | GET     | /api/v1/red-flags/record_id       | Retrieve a single incident by id     |
+| DELETE     | /api/v1/red-flags/record_id       | Delete a single incident by id     |
 | PATCH     | /api/v1/ red-flags/record_id/comment     | Edit an incident comment by ID    |
 | PATCH     | /api/v1/ red-flags/record_id/location     | Edit an incident location by ID    |
 
