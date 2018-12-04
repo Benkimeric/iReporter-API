@@ -4,11 +4,12 @@ records_list = []
 
 
 class Incidences():
+    """This class contains incidents model methods"""
     def __init__(self):
         self.incident = records_list
 
     def save(self, created_by, record_type, location, comment):
-        """"Method to save red-flags,def"""
+        """"Method to save red-flags"""
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         status = "Draft"
         data = {
@@ -23,18 +24,15 @@ class Incidences():
 
         self.incident.append(data)
 
-        #return the whole list
-        # return self.incident
-        #return new data
         return data
 
     def get_all_records(self):
-        """get all the records"""
+        """retrieves all the records"""
 
         return self.incident
 
     def get_one_record(self, record_id):
-        """get one record"""
+        """retrieves one record"""
 
         record = [record for record in records_list if record["record_id"] == record_id]
         return record
@@ -46,7 +44,7 @@ class Incidences():
 
         for comment in records_list:
             records_list[index]['comment'] = data
-            # return records_list
+            
 
     def update_record_location(self, location, index):
         """Edit existing record location"""
@@ -66,3 +64,4 @@ class Incidences():
             index += 1
 
         return index
+

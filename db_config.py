@@ -1,4 +1,5 @@
 import psycopg2
+import os
 
 url = "dbname ='ireporter' host='localhost' post='5432' user='postgres' password= 'kali12'"
 test_url = "dbname ='ireporter' host='localhost' post='5432' user='postgres' password= 'kali12'"
