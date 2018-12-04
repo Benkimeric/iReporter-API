@@ -1,6 +1,9 @@
-[![Coverage Status](https://coveralls.io/repos/github/Benkimeric/iReporter-API/badge.svg?branch=bg-fix-travis-162329458)](https://coveralls.io/github/Benkimeric/iReporter-API?branch=bg-fix-travis-162329458)   [![Build Status](https://travis-ci.org/Benkimeric/iReporter-API.svg?branch=bg-fix-travis-162329458)](https://travis-ci.org/Benkimeric/iReporter-API)
+[![Coverage Status](https://coveralls.io/repos/github/Benkimeric/iReporter-API/badge.svg?branch=bg-fix-travis-162329458)](https://coveralls.io/github/Benkimeric/iReporter-API?branch=bg-fix-travis-162329458)       [![Build Status](https://travis-ci.org/Benkimeric/iReporter-API.svg?branch=bg-fix-travis-162329458)](https://travis-ci.org/Benkimeric/iReporter-API)    [![Maintainability](https://api.codeclimate.com/v1/badges/3342f24d82c1a9a9a645/maintainability)](https://codeclimate.com/github/Benkimeric/iReporter-API/maintainability)
 
 # iReporter-API
+```
+iReporter is an application to report corruption and inform government on things it should intervene.
+```
 
 ### Tech/ Framework Used
 
