@@ -6,15 +6,18 @@ records_list = []
 
 class Incidences():
     """contains incidents model methods"""
+    count = 1
+
     def __init__(self):
         self.incident = records_list
+        self.id = Incidences.count
 
     def save(self, created_by, record_type, location, comment):
         """"Method to save red-flags"""
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         status = "Draft"
         data = {
-            "record_id": len(self.incident)+1,
+            "record_id": self.id,
             "createdOn": date,
             "created_by": created_by,
             "record_type": record_type,
@@ -24,6 +27,7 @@ class Incidences():
         }
 
         self.incident.append(data)
+        Incidences.count += 1
 
         return data
 
