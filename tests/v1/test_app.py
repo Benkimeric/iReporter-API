@@ -23,10 +23,6 @@ class Test(unittest.TestCase):
             "location": "10.0123, -34.034"
         }
 
-    def tearDown(self):
-        """Removes all initialised variables"""
-        pass
-
     def test_it_creates_incident_records(self):
         """test if posts an incident record """
 
