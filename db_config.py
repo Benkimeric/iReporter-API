@@ -1,48 +1,29 @@
 import psycopg2
 import os
+from app.api.v2.models.db_model import Database
 
-url = "dbname ='ireporter' host='localhost' post='5432' user='postgres' password= 'kali12'"
-test_url = "dbname ='ireporter' host='localhost' post='5432' user='postgres' password= 'kali12'"
 
-def connection(connect_url):
-    conn = psycopg2.connect(connect_url)
-    return conn
+def db_connection():
+    """Create Database Connection"""
 
-def init_db():
-    conn = connection(url)
-    return conn
+    url = "dbname='ireporter' host='localhost' \
+     port='5432' user='postgres'password='kali12'"
+
+    connection = psycopg2.connect(url)
+    return connection
+
 
 def create_tables():
-    conn = psycopg2.connect(url)
-    curr = conn.cursor()
-    queries = tables()
+    """Creates the Tables"""
 
-    for query in queries:
-        curr.execute(query)
-    conn.commit()
+    connection = db_connection()
+    cursor = connection.cursor()
 
-def destroy_tables():
-    pass
+    database = Database()
+    queries = database.db_query()
 
-def tables():
-    users = """ CREATE TABLE IF NOT EXISTS users(
-        user_id serial PRIMARY KEY NOT NULL,
-        first_name character varying(50) NOT NULL,
-        other_name character varying(50) NOT NULL,
-        last_name character varying(50) NOT NULL,
-        username character varying(50) NOT NULL,
-        date_created timestamp with time zone DEFAULT ('now'::text):: date NOT NULL,
-        password character varying(50) NOT NULL
-    )"""
+    for sql in queries:
+        cursor.execute(sql)
+        connection.commit()
 
-    incidents = """CREATE TABLE IF NOT EXISTS incidents(
-        incident_id serial PRIMARY KEY NOT NULL,
-        created_by numeric NOT NULL,
-        type character varying(50) NOT NULL,
-        status character varying(20) DEFAULT draft,
-        location character varying(100) NOT NULL,
-        created_on timestamp with time zone DEFAULT ('now'::text):: date NOT NULL,
-    )"""
-
-    queries = [users, incidents]
-    return queries
+    cursor.close()

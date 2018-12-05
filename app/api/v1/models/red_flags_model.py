@@ -34,7 +34,10 @@ class Incidences():
     def get_one_record(self, record_id):
         """retrieves one record"""
 
-        record = [record for record in records_list if record["record_id"] == record_id]
+        record = [
+            record for record in records_list if
+            record["record_id"] == record_id
+            ]
         return record
 
     def update_record(self, comment, index):
@@ -44,7 +47,6 @@ class Incidences():
 
         for comment in records_list:
             records_list[index]['comment'] = data
-            
 
     def update_record_location(self, location, index):
         """Edit existing record location"""
@@ -64,4 +66,3 @@ class Incidences():
             index += 1
 
         return index
-

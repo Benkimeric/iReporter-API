@@ -1,5 +1,5 @@
-from flask_restful import Resource, reqparse
-from flask import jsonify, make_response, request
+from flask_restful import Resource
+from flask import jsonify, request
 import re
 
 from ..models.red_flags_model import Incidences, records_list
@@ -21,19 +21,33 @@ class Records(Resource, Incidences):
         comment = data['comment']
 
         if comment == "" or not comment:
-            return {"message": "Please fill all the required fields", "status": 400}, 400
+            return {
+                "message": "Please fill all the required fields", "status": 400
+                }, 400
 
         if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", comment):
-            return {"message": "A comment cannot contain special characters e.g $"},400
+            return {
+                "message": "A comment cannot contain special characters e.g $"
+                }, 400
 
         elif record_type != "red-flag" and record_type != "intervention":
-            return {"message": "Record type can only be a red-flag or an intervention", "status": 400}, 400
+            return {
+                "message": "Record type can only be a red-flag or an "
+                "intervention", "status": 400
+                }, 400
 
         elif created_by.isdigit() is False:
-            return {"message": "Created by can only be a digit", "status": 400}, 400
+            return {
+                "message": "Created by can only be a digit", "status": 400
+                }, 400
 
-        elif not re.match(r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$", location):
-            return {"message": "Please ensure comma separated lat and long and within appropriate ranges", "status": 400}, 400
+        elif not re.match(
+                r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$",
+                location
+                ):
+            return {
+                "message": "Please ensure comma separated lat and long and "
+                "within appropriate ranges", "status": 400}, 400
 
         resp = self.db.save(created_by, record_type, location, comment)
         return {
@@ -52,11 +66,13 @@ class Records(Resource, Incidences):
 
         resp = self.db.get_all_records()
         if len(resp) == 0:
-            return {"message": "There are no records available", "status": 200},200
+            return {
+                "message": "There are no records available", "status": 200
+            }, 200
         return {
                 "status": 200,
                 "data": resp
-            },200
+            }, 200
 
 
 class OneRecord(Resource, Incidences):
@@ -70,16 +86,20 @@ class OneRecord(Resource, Incidences):
 
         record = self.get_one_record(records_id)
         if len(record) == 0:
-            return {"message": "This record does not exist", "status": 404},404
-        
-        return {"Record data": record, "status": 200},200
+            return {
+                "message": "This record does not exist", "status": 404
+                }, 404
+        return {
+            "Record data": record, "status": 200
+            }, 200
 
     def delete(self, records_id):
         """This method handles delte requests to delete an incident"""
         record = self.get_one_record(records_id)
         if len(record) == 0:
-            return {"message": "This record does not exist", "status": 404},404
-
+            return {
+                "message": "This record does not exist", "status": 404
+            }, 404
 
         records_list.remove(record[0])
 
@@ -91,7 +111,7 @@ class OneRecord(Resource, Incidences):
                         "message": "Red-flag record has been deleted"
                     }
                 ]
-            },200
+            }, 200
 
 
 class EditComment(Resource, Incidences):
@@ -100,12 +120,16 @@ class EditComment(Resource, Incidences):
         pass
 
     def patch(self, records_id):
-        """This method handles patch requests for an incident comment"""
+        """
+        This method handles patch requests for an incident comment
+        """
 
         record = self.get_one_record(records_id)
 
         if len(record) == 0:
-            return {"message": "This record does not exist", "status": 404},404
+            return {
+                "message": "This record does not exist", "status": 404
+            }, 404
 
         data = request.get_json()
 
@@ -127,7 +151,7 @@ class EditComment(Resource, Incidences):
                         "message": "Updated red-flag record's comment"
                     }
                 ]
-            },200
+            }, 200
 
 
 class EditLocation(Resource, Incidences):
@@ -142,14 +166,21 @@ class EditLocation(Resource, Incidences):
         record = self.get_one_record(records_id)
 
         if len(record) == 0:
-            return jsonify({"message": "This record does not exist", "status": 404})
+            return jsonify({
+                "message": "This record does not exist", "status": 404
+                })
 
         data = request.get_json()
 
         location = data['location']
 
-        if not re.match(r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$", location):
-            return {"message": "Please ensure comma separated lat and long and within appropriate ranges", "status": 400}, 400
+        if not re.match(
+                r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$",
+                location
+                ):
+            return {
+                "message": "Please ensure comma separated lat and long and "
+                "within appropriate ranges", "status": 400}, 400
 
         index = self.get_index(records_id)
 
@@ -170,5 +201,4 @@ class EditLocation(Resource, Incidences):
                     }
                 ]
 
-            },200
-
+            }, 200
