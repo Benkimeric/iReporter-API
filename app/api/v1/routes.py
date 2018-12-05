@@ -1,8 +1,6 @@
+from .views.red_flags_view import Records, OneRecord, EditComment, EditLocation
 
-from .views.red_flags_view import Records, OneRecord, EditComment,EditLocation
-
-
-from flask_restful import Api,Resource
+from flask_restful import Api, Resource
 from flask import Blueprint
 
 
