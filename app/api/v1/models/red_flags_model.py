@@ -1,10 +1,12 @@
 from datetime import datetime
 
+
 records_list = []
 
 
 class Incidences():
-    """This class contains incidents model methods"""
+    """contains incidents model methods"""
+
     def __init__(self):
         self.incident = records_list
 

@@ -1,8 +1,35 @@
 from flask_restful import Resource
 from flask import jsonify, request
 import re
+from flask_restful import reqparse
 
 from ..models.red_flags_model import Incidences, records_list
+
+parser = reqparse.RequestParser(bundle_errors=True)
+parser.add_argument(
+    'comment', type=str,
+    required=True,
+    help="Comment cannot be left blank"
+    )
+
+parser = reqparse.RequestParser(bundle_errors=True)
+parser.add_argument(
+    'location', type=str,
+    required=True,
+    help="Location cannot be left blank"
+    )
+
+parser.add_argument(
+    'record_type', type=str,
+    required=True,
+    help="Record Type cannot be left blank"
+    )
+
+parser.add_argument(
+    'created_by', type=str,
+    required=True,
+    help="Created by cannot be left blank"
+    )
 
 
 class Records(Resource, Incidences):
@@ -13,6 +40,8 @@ class Records(Resource, Incidences):
 
     def post(self):
         """This method handles post requests to save a new incident"""
+
+        args = parser.parse_args()
 
         data = request.get_json()
         created_by = data['created_by']
@@ -62,7 +91,7 @@ class Records(Resource, Incidences):
             }, 201
 
     def get(self):
-        """This method handles get requests to get one incident record"""
+        """handles get requests to get one incident record"""
 
         resp = self.db.get_all_records()
         if len(resp) == 0:
@@ -76,13 +105,10 @@ class Records(Resource, Incidences):
 
 
 class OneRecord(Resource, Incidences):
-    """This class contain methods for incident endpoints"""
-
-    def __init__(self):
-        pass
+    """contain methods for incident endpoints"""
 
     def get(self, records_id):
-        """This method handles get requests to fetch one incident"""
+        """handles get requests to fetch one incident"""
 
         record = self.get_one_record(records_id)
         if len(record) == 0:
@@ -94,7 +120,7 @@ class OneRecord(Resource, Incidences):
             }, 200
 
     def delete(self, records_id):
-        """This method handles delte requests to delete an incident"""
+        """handles delete requests to delete an incident"""
         record = self.get_one_record(records_id)
         if len(record) == 0:
             return {
@@ -115,13 +141,11 @@ class OneRecord(Resource, Incidences):
 
 
 class EditComment(Resource, Incidences):
-    """This class contains methods for editing incident comment"""
-    def __init__(self):
-        pass
+    """contains methods for editing incident comment"""
 
     def patch(self, records_id):
         """
-        This method handles patch requests for an incident comment
+        handles patch requests for an incident comment
         """
 
         record = self.get_one_record(records_id)
@@ -131,6 +155,14 @@ class EditComment(Resource, Incidences):
                 "message": "This record does not exist", "status": 404
             }, 404
 
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument(
+            'comment', type=str,
+            required=True,
+            help="Comment cannot be left blank"
+            )
+
+        args = parser.parse_args()
         data = request.get_json()
 
         comment = data['comment']
@@ -155,10 +187,7 @@ class EditComment(Resource, Incidences):
 
 
 class EditLocation(Resource, Incidences):
-    """This class contains methods for editing incident location"""
-
-    def __init__(self):
-        pass
+    """contains methods for editing incident location"""
 
     def patch(self, records_id):
         """This method handles patch requests for an incident location"""
@@ -169,6 +198,15 @@ class EditLocation(Resource, Incidences):
             return jsonify({
                 "message": "This record does not exist", "status": 404
                 })
+
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument(
+            'location', type=str,
+            required=True,
+            help="location cannot be left blank"
+            )
+
+        args = parser.parse_args()
 
         data = request.get_json()
 
