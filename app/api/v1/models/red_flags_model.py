@@ -25,7 +25,6 @@ class Incidences():
         }
 
         self.incident.append(data)
-        Incidences.count += 1
 
         return data
 

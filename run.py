@@ -19,10 +19,13 @@ def page_not_found(e):
 
 @app.errorhandler(Exception)
 def unhandled_exception(e):
-    return jsonify(
-        {
-            "message": "Server error. Please contact the admin", "status": 500
-            }, 500
+    return make_response(
+        jsonify(
+            {
+                "message": "iReporter Server error. Please contact the admin",
+                "status": 500
+            }
+        ), 500
     )
 
 
