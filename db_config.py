@@ -1,5 +1,6 @@
 import psycopg2
 import os
+from app.api.v2.models.db_model import Database
 
 
 def db_connection():
