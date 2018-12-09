@@ -167,6 +167,16 @@ class EditComment(Resource, Incidences):
 
         comment = data['comment']
 
+        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", comment):
+            return {
+                "message": "A comment cannot contain special characters e.g $"
+                }, 400
+
+        if comment == "" or not comment:
+            return {
+                "message": "Please fill all the required fields", "status": 400
+                }, 400
+
         index = self.get_index(records_id)
 
         data = {

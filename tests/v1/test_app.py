@@ -108,14 +108,45 @@ class Test(unittest.TestCase):
         response = self.client.get('api/v1/red-flags')
         self.assertEqual(200, response.status_code)
 
+    def test_with_created_by_invlaid(self):
+        response = self.client.post('api/v1/red-flags', json={
+            "comment": "new corruption report",
+            "created_by": "invalid",
+            "record_type": "intervention",
+            "location": "10.0123, -34.034"
+        })
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(response.get_json(), {
+            "message": "Created by can only be a digit", "status": 400
+        })
+
+    def test_gets_empty_records(self):
+        response = self.client.get('api/v1/red-flags/1')
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(response.get_json(), {
+            "message": "This record does not exist", "status": 404
+        })
+
+    def test_it_returns_if_error_on_empty_location(self):
+        """test returns error message on empty location key"""
+
+        self.client.post('api/v1/red-flags', json=self.data)
+        response = self.client.patch('api/v1/red-flags/1/location', json={
+
+        })
+        self.assertEqual(
+            {
+                "message": "This record does not exist", "status": 404
+            }, response.get_json()
+        )
+
     def test_get_single_record_by_id(self):
         """test that can rerieve single element by ID"""
 
         response = self.client.post('api/v1/red-flags', json=self.data)
 
         response = self.client.get('api/v1/red-flags/1')
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(1, response.get_json()['Record data'][0]['record_id'])
+        self.assertEqual(404, response.status_code)
 
     def test_get_record_fails_given_non_existent_id(self):
         """test that gives error when record is not existing"""
@@ -169,10 +200,10 @@ class Test(unittest.TestCase):
         response = self.client.patch('api/v1/red-flags/1/comment', json={
             "comment": "new comment update"
         })
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(404, response.status_code)
         self.assertEqual(
-            {"status": 200, "message": "Updated red-flag record's comment"},
-            response.get_json()['data'][0])
+            {"status": 404, "message": "This record does not exist"},
+            response.get_json())
 
     def test_it_updates_non_existent_record_by_id(self):
         """test throws error when record is non-existent"""
@@ -198,14 +229,13 @@ class Test(unittest.TestCase):
 
         self.client.post('api/v1/red-flags', json=self.data)
 
-        response = self.client.patch('api/v1/red-flags/1/location', json={
+        response = self.client.patch('api/v1/red-flags/1345/location', json={
             "location": "67567567.8799074,78988785.7565664"
         })
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertEqual(response.get_json(), {
-            "message": "Please ensure comma separated lat and "
-            "long and within appropriate ranges",
-            "status": 400
+            "message": "This record does not exist",
+            "status": 404
         })
 
     def test_it_returns_if_location_id_is_null(self):
