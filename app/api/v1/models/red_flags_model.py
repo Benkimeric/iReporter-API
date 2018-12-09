@@ -6,6 +6,7 @@ records_list = []
 
 class Incidences():
     """contains incidents model methods"""
+    counter = 1
 
     def __init__(self):
         self.incident = records_list
@@ -15,7 +16,7 @@ class Incidences():
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         status = "Draft"
         data = {
-            "record_id": len(self.incident)+1,
+            "record_id": Incidences.counter,
             "createdOn": date,
             "created_by": created_by,
             "record_type": record_type,
@@ -25,6 +26,7 @@ class Incidences():
         }
 
         self.incident.append(data)
+        Incidences.counter += 1
 
         return data
 
