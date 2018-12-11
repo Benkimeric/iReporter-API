@@ -556,24 +556,3 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(result['message'],
                          'intervention ID s is invalid'
                          )
-
-    # def test_edit_on_non_existent_comment(self):
-    #     """test throws error on non digit ID"""
-    #     # post 1
-    #     self.client.post('/api/v2/interventions',
-    #                      data=json.dumps(new_incident_data),
-    #                      headers={'Authorization': 'Bearer ' +
-    #                               self.token, 'content-type':
-    #                               'application/json'})
-    #     # enter non digit id and patch
-    #     response = self.client.patch('/api/v2/interventions/4/comment',
-    #                                  data=json.dumps(edit_comment_data),
-    #                                  headers={'Authorization': 'Bearer ' +
-    #                                           self.token, 'content-type':
-    #                                           'application/json'})
-    #     # assert
-    #     self.assertEqual(response.status_code, 400)
-    #     result = json.loads(response.data)
-    #     self.assertEqual(result['message'],
-    #                      'This intervention record does not exist'
-    #                      )
