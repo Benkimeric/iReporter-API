@@ -35,6 +35,12 @@ parser.add_argument('user_name', type=str, required=True,
 parser.add_argument('password', type=str, required=True,
                     help="password cannot be left blank")
 
+parser2 = reqparse.RequestParser()
+parser2.add_argument('user_name', help='This field cannot be blank',
+                     required=True)
+parser2.add_argument('password', help='This field cannot be blank',
+                     required=True)
+
 
 class UsersView(Resource, Users):
     """class to hold methods for users"""
