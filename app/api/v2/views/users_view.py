@@ -142,3 +142,64 @@ class UsersView(Resource, Users):
         except Exception as error:
             print(error)
             return jsonify({"message": "Error when saving user"})
+
+
+class OneUser(Resource, Users):
+
+    def post(self):
+        """logs in a user to the system"""
+
+        index_name = "user_name"
+        index_pass = "password"
+
+        conn = db_connection()
+        cur = conn.cursor()
+
+        data = parser2.parse_args()
+        username = data['user_name']
+        password = data['password']
+
+        # fetch the username
+        sql = self.get_by_username()
+        cur.execute(sql, (username,))
+        username_data = cur.fetchone()
+
+        if username_data is None:
+            return{
+                "status": 401,
+                "message": "You have entered wrong username or password"
+                }, 401
+
+        # check password
+        if username_data[9] != password:
+            return{
+                "status": 401,
+                "message": "You have entered wrong username or password"
+                }, 401
+
+        id_of_user = username_data[0]
+        f_name = username_data[1]
+        o_name = username_data[2]
+        l_name = username_data[3]
+        u_name = username_data[4]
+        email = username_data[5]
+        phone = username_data[6]
+        admin = username_data[7]
+
+        access_token = create_access_token(identity=id_of_user)
+        return {
+                "status": 200,
+                "token": access_token,
+                "data": [
+                    {
+                        "token": access_token,
+                        "user ID": id_of_user,
+                        "username": u_name,
+                        "first name": f_name,
+                        "last name": l_name,
+                        "other names": o_name,
+                        "phone": phone,
+                        "email": email
+                    }
+                ]
+            }, 200
