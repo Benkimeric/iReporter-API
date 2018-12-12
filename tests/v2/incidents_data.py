@@ -78,3 +78,7 @@ invalid_location_data = {
 admin_status_change = {
     "status": "resolved"
 }
+
+invalid_status = {
+    "status": "simply invalid"
+}
