@@ -45,9 +45,11 @@ class IncidentViews(Resource, Incidents):
 
         type = data['record_type']
 
-        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']):
+        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']
+                        ) or data['comment'].isspace():
             return {
-                "message": "A comment cannot contain special characters e.g $"
+                "message": "A comment cannot contain special characters e.g $ "
+                           "or empty space"
                 }, 400
 
         if data['record_type'] not in map(str.lower, types_or_record):
@@ -57,7 +59,7 @@ class IncidentViews(Resource, Incidents):
                 }, 400
 
         if not re.match(
-                r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$",
+                r"^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$",
                 data['location']
                 ):
             return {
@@ -145,9 +147,11 @@ class EditComment(Resource, Incidents):
         comment = data['comment']
         user = get_jwt_identity()
 
-        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']):
+        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']
+                        ) or data['comment'].isspace():
             return {
-                "message": "A comment cannot contain special characters e.g $"
+                "message": "A comment cannot contain special characters e.g $ "
+                           "or empty space"
                 }, 400
 
         return self.incidents.update_intervention(
@@ -187,7 +191,7 @@ class EditLocation(Resource, Incidents):
         user = get_jwt_identity()
 
         if not re.match(
-                r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$",
+                r"^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$",
                 location
                 ):
             return {

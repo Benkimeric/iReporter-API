@@ -8,7 +8,7 @@ from .incidents_data import (sign_up_data, sign_in_data, new_incident_data,
                              sign_up_data_2, edit_comment_data,
                              edit_location_data, invalid_comment_data,
                              invalid_location_data, admin_sign_in,
-                             admin_status_change
+                             admin_status_change, invalid_status
                              )
 
 
@@ -32,7 +32,7 @@ class IncidentsTests(unittest.TestCase):
                                                data=json.dumps(sign_in_data),
                                                content_type='application/json')
         self.login_result = json.loads(self.login_response.data)
-        self.token = self.login_result['token']
+        self.token = self.login_result['data'][0]['token']
 
         # login the admin
         self.response_admin = self.client.post('/api/v2/auth/login',
@@ -41,7 +41,7 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(200, self.response_admin.status_code)
         self.admin_result = json.loads(self.response_admin.data)
 
-        self.admin_token = self.admin_result['token']
+        self.admin_token = self.admin_result['data'][0]['token']
 
     def tearDown(self):
         connection = db_connection()
@@ -71,8 +71,9 @@ class IncidentsTests(unittest.TestCase):
                                              self.token, 'content-type':
                                              'application/json'})
         result = json.loads(response.data)
-        self.assertEqual(result['message'], 'A comment cannot contain '
-                         'special characters e.g $'
+        self.assertEqual(result['message'],
+                         'A comment cannot contain special characters e.g $ '
+                         'or empty space'
                          )
         self.assertEqual(response.status_code, 400)
 
@@ -384,7 +385,8 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'A comment cannot contain special characters e.g $'
+                         'A comment cannot contain special characters e.g $ '
+                         'or empty space'
                          )
 
     def test_throws_error_on_patch_invalid_location(self):
@@ -555,4 +557,145 @@ class IncidentsTests(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(result['message'],
                          'intervention ID s is invalid'
+                         )
+
+    def test_returns_error_on_deleting_non_existent(self):
+        """test for deleting a record which is non existent"""
+        # delete a record
+        response = self.client.delete('/api/v2/interventions/333',
+                                      headers={'Authorization': 'Bearer ' +
+                                               self.token, 'content-type':
+                                               'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 404)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'This intervention record does not exist'
+                         )
+
+    def test_returns_error_on_updating_non_existent_incident_comment(self):
+        """test for editing record comment which is non existent"""
+        # delete a record
+        response = self.client.patch('/api/v2/interventions/333/comment',
+                                     data=json.dumps(edit_comment_data),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 404)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'This intervention record does not exist'
+                         )
+
+    def test_returns_error_on_updating_non_existent_incident_location(self):
+        """test for editing record comment which is non existent"""
+        # delete a record
+        response = self.client.patch('/api/v2/interventions/333/location',
+                                     data=json.dumps(edit_location_data),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 404)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'This intervention record does not exist'
+                         )
+
+    def test_admin_cannot_change_status_to_invalid(self):
+        """test that admin cannot change status to invalid one"""
+        # post 1
+        self.client.post('/api/v2/interventions',
+                         data=json.dumps(new_incident_data),
+                         headers={'Authorization': 'Bearer ' +
+                                  self.token, 'content-type':
+                                  'application/json'})
+
+        # admin patch
+        response = self.client.patch('/api/v2/interventions/1/status',
+                                     data=json.dumps(invalid_status),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 400)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'Status can only be resolved, rejected or an '
+                         'under investigation'
+                         )
+
+    def test_admin_cannot_change_status_for_non_existent(self):
+        """test throws error on status change for non existent record"""
+
+        # admin patch
+        response = self.client.patch('/api/v2/interventions/333/status',
+                                     data=json.dumps(admin_status_change),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 404)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'This intervention record does not exist'
+                         )
+
+    def test_non_admin_cannot_change_status(self):
+        """test throws error on status change for non existent record"""
+        # post 1
+        self.client.post('/api/v2/interventions',
+                         data=json.dumps(new_incident_data),
+                         headers={'Authorization': 'Bearer ' +
+                                  self.token, 'content-type':
+                                  'application/json'})
+
+        # admin patch
+        response = self.client.patch('/api/v2/interventions/1/status',
+                                     data=json.dumps(admin_status_change),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 403)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'This action is only allowed to admins'
+                         )
+
+    def test_throws_error_on_patch_invalid_comment_id(self):
+        """test cant edit comment with invalid id"""
+        # post 1
+        self.client.post('/api/v2/interventions',
+                         data=json.dumps(new_incident_data),
+                         headers={'Authorization': 'Bearer ' +
+                                  self.token, 'content-type':
+                                  'application/json'})
+        # patch the record
+        response = self.client.patch('/api/v2/interventions/fhgfhg/comment',
+                                     data=json.dumps(invalid_comment_data),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 400)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'intervention ID fhgfhg is invalid'
+                         )
+
+    def test_throws_error_on_invalid_id_for_status(self):
+        """test for invalid id entered to change status"""
+        # admin patch
+        response = self.client.patch('/api/v2/interventions/hgfgf/status',
+                                     data=json.dumps(invalid_status),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 400)
+        result = json.loads(response.data)
+        self.assertEqual(result['message'],
+                         'intervention ID hgfgf is invalid'
                          )

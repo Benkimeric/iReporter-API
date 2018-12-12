@@ -219,9 +219,22 @@ class Incidents():
             sql_update = update_query
             cur.execute(sql_update, (comment, type, incident_id,))
             conn.commit()
+            # updated record
+            sql = self.incident_fetch()
+            cur.execute(sql, (type, incident_id,))
+            updated_data = cur.fetchone()
+
+            incident_dict = {
+                "created by": str(updated_data[2]),
+                "type": updated_data[3],
+                "location": updated_data[4],
+                "status": updated_data[5],
+                "comment": updated_data[6]
+            }
             return {
                 "id": incident_id,
-                "message": "Updated " + type + " records comment"
+                "message": "Updated " + type + " records comment",
+                "data": incident_dict
             }, 200
         except Exception as error:
             print(error)
@@ -273,9 +286,22 @@ class Incidents():
                             incident_id = %s;"
             cur.execute(sql_update, (location, type, incident_id,))
             conn.commit()
+            # updated record
+            sql = self.incident_fetch()
+            cur.execute(sql, (type, incident_id,))
+            updated_data = cur.fetchone()
+
+            incident_dict = {
+                "created by": str(updated_data[2]),
+                "type": updated_data[3],
+                "location": updated_data[4],
+                "status": updated_data[5],
+                "comment": updated_data[6]
+            }
             return {
                 "id": incident_id,
-                'message': 'Updated ' + type + ' records location'
+                'message': 'Updated ' + type + ' records location',
+                "data": incident_dict
             }
         except Exception as error:
             print(error)
