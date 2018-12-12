@@ -217,3 +217,54 @@ class Incidents():
         except Exception as error:
             print(error)
             return jsonify({'message': 'Error updating ' + type + ' comment'})
+
+    def update_intervention_location(self, type, incident_id, user, location):
+        """updates intervention location"""
+
+        query = "UPDATE incidents SET location = %s WHERE type = %s AND\
+         incident_id = %s;"
+
+        conn = db_connection()
+        cur = conn.cursor()
+
+        sql = self.incident_fetch()
+        cur.execute(sql, (type, incident_id,))
+        intervention_data = cur.fetchone()
+        creator = intervention_data[2]
+        record_status = intervention_data[5]
+
+        if intervention_data is None:
+            return {
+                "status": 404,
+                'message': 'This ' + type + ' record does not exist'
+            }, 404
+
+        user_sql = self.check_user()
+        cur.execute(user_sql, (user,))
+        user_data = cur.fetchone()
+        user_id = user_data[0]
+
+        if user_id != creator:
+            return {
+                "status": 403,
+                'message': 'You can not edit other peoples records!'
+            }, 403
+
+        if record_status in types_of_statuses[:-1]:
+            return {
+                "status": 403,
+                'message': 'You can not edit this record, it '
+                'is already ' + record_status
+            }, 403
+
+        try:
+            sql_update = query
+            cur.execute(sql_update, (location, type, incident_id,))
+            conn.commit()
+            return {
+                "id": incident_id,
+                'message': 'Updated ' + type + ' records location'
+            }
+        except Exception as error:
+            print(error)
+            return jsonify({'message': 'Error updating ' + type + ' location'})

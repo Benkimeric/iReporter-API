@@ -157,3 +157,38 @@ parser_patch_l.add_argument(
         required=True,
         help="Location cannot be left blank"
     )
+
+
+class EditLocation(Resource, Incidents):
+    """contains method to edit an incident record"""
+
+    def __init__(self):
+        """Initialises the editlocation class"""
+
+        self.incidents = Incidents()
+
+    def patch(self, type, incident_id):
+        """updates incident record location"""
+
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+                }, 400
+
+        args = parser_patch_l.parse_args()
+        data = request.get_json()
+
+        location = data['location']
+        user = get_jwt_identity()
+
+        if not re.match(
+                r"^([-+]?\d{1,2}([.]\d+)?),\s*([-+]?\d{1,3}([.]\d+)?)$",
+                location
+                ):
+            return {
+                "message": "Please ensure comma separated lat and long and "
+                "within appropriate ranges", "status": 400}, 400
+
+        return self.incidents.update_intervention_location(
+            type, incident_id, user, location)
