@@ -192,3 +192,39 @@ class EditLocation(Resource, Incidents):
 
         return self.incidents.update_intervention_location(
             type, incident_id, user, location)
+
+
+parser_patch_s = reqparse.RequestParser(bundle_errors=True)
+parser_patch_s.add_argument(
+        'status', type=str,
+        required=True,
+        help="Status cannot be left blank"
+    )
+
+
+class ChangeStatus(Resource, Incidents):
+    """contains method to edit an incident record"""
+
+    def __init__(self):
+        """Initialises the ChangeInterStatus class"""
+
+        self.incidents = Incidents()
+
+    # only for admins
+    @jwt_required
+    def patch(self, type, incident_id):
+        """updates incident record status"""
+
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+                }, 400
+
+        args = parser_patch_s.parse_args()
+        data = request.get_json()
+
+        status = data['status']
+        user = get_jwt_identity()
+
+        return self.incidents.update_status(type, incident_id, user, status)

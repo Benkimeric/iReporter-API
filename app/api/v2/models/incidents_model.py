@@ -268,3 +268,63 @@ class Incidents():
         except Exception as error:
             print(error)
             return jsonify({'message': 'Error updating ' + type + ' location'})
+
+    def update_status(self, type, incident_id, user, status):
+        """updates incident status"""
+
+        query = "UPDATE incidents SET status = %s WHERE type = %s AND\
+         incident_id = %s;"
+
+        conn = db_connection()
+        cur = conn.cursor()
+
+        if status not in map(str.lower, types_of_statuses):
+            return {
+                "message": "Status can only be resolved, rejected or an "
+                "under investigation", "status": 400
+                }, 400
+
+        sql = self.incident_fetch()
+        cur.execute(sql, (type, incident_id,))
+        intervention_data = cur.fetchone()
+
+        if intervention_data is None:
+            return {
+                "status": 404,
+                "message": "This " + type + " record does not exist"
+            }, 404
+
+        user_sql = self.check_user()
+        cur.execute(user_sql, (user,))
+        user_data = cur.fetchone()
+        user_role = user_data[7]
+
+        if user_role is False:
+            return {
+                "status": 403,
+                "message": "This action is only allowed to admins"
+            }, 403
+
+        try:
+            sql_update = "UPDATE incidents SET status = %s WHERE type = %s AND\
+                        incident_id = %s;"
+            cur.execute(sql_update, (status, type, incident_id,))
+            conn.commit()
+            return {
+                "id": incident_id,
+                "message": "Updated " + type + " record status"
+            }
+        except Exception as error:
+            print(error)
+            return jsonify({"message": "Error updating " + type + " status"})
+
+    def check_user(self):
+        query = "SELECT * FROM users WHERE user_id = %s"
+        return query
+
+    def incident_fetch(self):
+        """fetches type and id of an incident"""
+
+        sql = "SELECT * FROM incidents WHERE type = %s\
+         and incident_id = %s;"
+        return sql
