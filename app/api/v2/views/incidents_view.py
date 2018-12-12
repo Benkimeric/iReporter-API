@@ -110,3 +110,50 @@ class OneIntervention(Resource, Incidents):
 
         user = get_jwt_identity()
         return self.incidents.delete_intervention(type, incident_id, user)
+
+parser_patch_c = reqparse.RequestParser(bundle_errors=True)
+parser_patch_c.add_argument(
+        'comment', type=str,
+        required=True,
+        help="Comment cannot be left blank"
+    )
+
+
+class EditComment(Resource, Incidents):
+    """contains method to edit an incident record"""
+
+    def __init__(self):
+        """Initialises the editcomment class"""
+
+        self.incidents = Incidents()
+
+    def patch(self, type, incident_id):
+        """updates incident record comment"""
+
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+                }, 400
+
+        args = parser_patch_c.parse_args()
+        data = request.get_json()
+
+        comment = data['comment']
+        user = get_jwt_identity()
+
+        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']):
+            return {
+                "message": "A comment cannot contain special characters e.g $"
+                }, 400
+
+        return self.incidents.update_intervention(
+            type, incident_id, user, comment)
+
+
+parser_patch_l = reqparse.RequestParser(bundle_errors=True)
+parser_patch_l.add_argument(
+        'location', type=str,
+        required=True,
+        help="Location cannot be left blank"
+    )

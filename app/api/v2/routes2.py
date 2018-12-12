@@ -14,3 +14,4 @@ api.add_resource(OneUser, 'auth/login')
 
 api.add_resource(IncidentViews, '<type>s')
 api.add_resource(OneIntervention, '<type>s/<incident_id>')
+api.add_resource(EditComment, '<type>s/<incident_id>/comment')
