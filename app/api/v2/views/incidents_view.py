@@ -98,3 +98,15 @@ class OneIntervention(Resource, Incidents):
                 }, 400
 
         return self.incidents.get_one_incident(type, incident_id)
+
+    def delete(self, type, incident_id):
+        """deletes existing intervention record"""
+
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+                }, 400
+
+        user = get_jwt_identity()
+        return self.incidents.delete_intervention(type, incident_id, user)

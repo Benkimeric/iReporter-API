@@ -138,7 +138,7 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'No Intervention records available')
+                         'No intervention records available')
 
     def test_gets_a_single(self):
         """test that can fetch a single the incident record"""
