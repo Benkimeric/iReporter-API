@@ -3,22 +3,22 @@ sign_up_data = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423939",
+        "phone_number": "0727423939",
         "user_name": "benk",
         "email": "benk@benkim.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 # valid sign in data from valid sign up
 sign_in_data = {
         "user_name": "benk",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 # sign in data with wrong username
 invalid_username = {
         "user_name": "invalid",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 # sign in data with wrong password
@@ -33,10 +33,10 @@ sign_up_data_fake_email = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423949",
+        "phone_number": "0727423939",
         "user_name": "benk",
         "email": "invalid",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 # wrong phone
@@ -47,55 +47,65 @@ sign_up_invalid_phone = {
         "phone_number": "+5464",
         "user_name": "benk",
         "email": "valid@gmail.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 invalid_f_name = {
         "first_name": "1234",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423949",
+        "phone_number": "0727423939",
         "user_name": "benk",
         "email": "valid@gmail.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 invalid_l_name = {
         "first_name": "Benkim",
         "last_name": "343",
         "other_names": "Eric",
-        "phone_number": "+254727423949",
+        "phone_number": "0727423939",
         "user_name": "benk",
         "email": "valid@gmail.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 invalid_o_name = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "#$565",
-        "phone_number": "+254727423949",
+        "phone_number": "0727423939",
         "user_name": "benk",
         "email": "valid@gmail.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 existing_phone = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423939",
+        "phone_number": "0727423939",
         "user_name": "newusername",
         "email": "newmail@benkim.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 existing_email = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423239",
+        "phone_number": "0727423939",
         "user_name": "bena",
         "email": "benk@benkim.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
+}
+
+password_data = {
+        "first_name": "Benkim",
+        "last_name": "Eric",
+        "other_names": "Kimeu",
+        "phone_number": "0727423939",
+        "user_name": "benk",
+        "email": "benk@benkim.com",
+        "password": "invalid"
 }
