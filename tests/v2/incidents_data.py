@@ -3,20 +3,20 @@ sign_up_data = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423939",
+        "phone_number": "0727423912",
         "user_name": "benk",
         "email": "benk@benkim.com",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 sign_up_data_2 = {
         "first_name": "Benkim",
         "last_name": "Eric",
         "other_names": "Kimeu",
-        "phone_number": "+254727423966",
+        "phone_number": "0727423916",
         "user_name": "benk2",
         "email": "benk2@benkim.com",
-        "password": "qwerty122"
+        "password": "Us7cgsTsben"
 }
 
 admin_sign_in = {
@@ -27,12 +27,12 @@ admin_sign_in = {
 # valid sign in data from valid sign up
 sign_in_data = {
         "user_name": "benk",
-        "password": "qwerty12"
+        "password": "Us7cgsTsben"
 }
 
 sign_in_data_2 = {
         "user_name": "benk2",
-        "password": "qwerty122"
+        "password": "Us7cgsTsben"
 }
 
 # valid incident data

@@ -5,12 +5,6 @@ from flask_restful import reqparse
 from flask_jwt_extended import create_access_token, get_jwt_identity
 import re
 
-from ...v2.models import users_model
-
-from db_config import db_connection
-from flask import jsonify
-import psycopg2
-import os
 
 is_admin = False
 
@@ -49,11 +43,6 @@ class UsersView(Resource, Users):
 
     def post(self):
 
-        conn = db_connection()
-        cur = conn.cursor()
-
-        args = parser.parse_args()
-
         data = request.get_json()
 
         if data['first_name'].isalpha() is False:
@@ -71,141 +60,38 @@ class UsersView(Resource, Users):
                         data['email']):
             return {"message": "Please provide a valid email address"}, 400
 
-        if not re.match(r"([+ 0-9]{13})", data['phone_number']):
+        if not re.match(r"(^07\d{8}$)", data['phone_number']):
             return {
                 "message": "Please provide a valid phone number"
-                " e.g +254727423942"
+                " e.g 0727423XXX"
                 }, 400
 
-        first_name = data['first_name']
-        last_name = data['last_name']
-        other_names = data['other_names']
-        email = data['email']
+        if not re.match(r"(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)",
+                        data['password']):
+            return {"message": "password min length is 8 characters, at least "
+                    "1 letter and 1 number"}, 400
+
+        first_name = str(data['first_name']).lower()
+        last_name = str(data['last_name']).lower()
+        other_names = str(data['other_names']).lower()
+        email = str(data['email']).lower()
         phone_number = data['phone_number']
-        user_name = data['user_name']
+        user_name = str(data['user_name']).lower()
         password = data['password']
 
-        sql = self.get_by_username()
-        cur.execute(sql, (user_name,))
-        username_data = cur.fetchone()
-
-        if username_data is not None:
-            return {
-                "status": 409,
-                "message": "A user with this username exists"
-                }, 409
-
-        sql = self.check_email()
-        cur.execute(sql, (email,))
-        data = cur.fetchone()
-
-        if data is not None:
-            return {
-                "status": 409,
-                "message": "A user with this email already exists"
-                }, 409
-
-        sql = self.check_phone()
-        cur.execute(sql, (phone_number,))
-        phone_data = cur.fetchone()
-
-        if phone_data is not None:
-            return {
-                "status": 409,
-                "message": "A user with this phone number already exists"
-                }, 409
-
-        try:
-            sql = self.user.save_user()
-            cur.execute(sql, (first_name, last_name, other_names, user_name,
-                              email, phone_number, is_admin, password))
-            conn.commit()
-            # get saved user
-            sql = self.get_by_username()
-            cur.execute(sql, (user_name,))
-            new_data = cur.fetchone()
-
-            new_user_id = new_data[0]
-            users_dict = {
-                "first name": new_data[1],
-                "last name": new_data[2],
-                "other names": new_data[3],
-                "user name": new_data[4],
-                "email": new_data[5],
-                "phone": new_data[6]
-            }
-
-            access_token = create_access_token(identity=new_user_id)
-            return {
-                "status": 201,
-                "data": [
-                    {
-                        "token": access_token,
-                        "user": users_dict
-                    }
-                ]
-            }, 201
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error when saving user"})
+        return self.save_user(first_name, last_name, other_names,
+                              user_name, email, phone_number, is_admin,
+                              password)
 
 
 class OneUser(Resource, Users):
+    """class to hold user login method"""
 
     def post(self):
         """logs in a user to the system"""
-
-        index_name = "user_name"
-        index_pass = "password"
-
-        conn = db_connection()
-        cur = conn.cursor()
 
         data = parser2.parse_args()
         username = data['user_name']
         password = data['password']
 
-        # fetch the username
-        sql = self.get_by_username()
-        cur.execute(sql, (username,))
-        username_data = cur.fetchone()
-
-        if username_data is None:
-            return{
-                "status": 401,
-                "message": "You have entered wrong username or password"
-                }, 401
-
-        # check password
-        if username_data[9] != password:
-            return{
-                "status": 401,
-                "message": "You have entered wrong username or password"
-                }, 401
-
-        id_of_user = username_data[0]
-        f_name = username_data[1]
-        o_name = username_data[2]
-        l_name = username_data[3]
-        u_name = username_data[4]
-        email = username_data[5]
-        phone = username_data[6]
-        admin = username_data[7]
-
-        access_token = create_access_token(identity=id_of_user)
-        return {
-                "status": 200,
-                "token": access_token,
-                "data": [
-                    {
-                        "token": access_token,
-                        "user ID": id_of_user,
-                        "username": u_name,
-                        "first name": f_name,
-                        "last name": l_name,
-                        "other names": o_name,
-                        "phone": phone,
-                        "email": email
-                    }
-                ]
-            }, 200
+        return self.login_user(username, password)

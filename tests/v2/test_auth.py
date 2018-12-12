@@ -7,7 +7,7 @@ from .data import (sign_up_data, sign_up_data_fake_email,
                    sign_up_invalid_phone, invalid_f_name,
                    invalid_l_name, invalid_o_name,
                    existing_phone, sign_in_data, invalid_username,
-                   wrong_phone, existing_email)
+                   wrong_phone, existing_email, password_data)
 
 
 class Registration(unittest.TestCase):
@@ -56,8 +56,8 @@ class Registration(unittest.TestCase):
             content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(result['message'], 'Please provide a '
-                         'valid phone number e.g +254727423942')
+        self.assertEqual(result['message'], 'Please provide a valid '
+                         'phone number e.g 0727423XXX')
 
     def test_throws_eror_with_invalid_first_name(self):
         """test registratiion with invalid first name"""
@@ -206,3 +206,16 @@ class Registration(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(
             result['message'], 'You have entered wrong username or password')
+
+    def test_valid_password_length(self):
+        """test registratiion with invalid password length"""
+
+        response = self.client.post(
+            "api/v2/auth/signup",
+            data=json.dumps(password_data),
+            content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(result['message'], 'password min length is '
+                         '8 characters, at least 1 letter and 1 number'
+                         )
