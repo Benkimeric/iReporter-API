@@ -88,6 +88,7 @@ class OneIntervention(Resource, Incidents):
     def __init__(self):
         self.incidents = Incidents()
 
+    @jwt_required
     def get(self, type, incident_id):
         """gets a single intervention record by id"""
 
@@ -99,6 +100,7 @@ class OneIntervention(Resource, Incidents):
 
         return self.incidents.get_one_incident(type, incident_id)
 
+    @jwt_required
     def delete(self, type, incident_id):
         """deletes existing intervention record"""
 
@@ -127,6 +129,7 @@ class EditComment(Resource, Incidents):
 
         self.incidents = Incidents()
 
+    @jwt_required
     def patch(self, type, incident_id):
         """updates incident record comment"""
 
@@ -167,6 +170,7 @@ class EditLocation(Resource, Incidents):
 
         self.incidents = Incidents()
 
+    @jwt_required
     def patch(self, type, incident_id):
         """updates incident record location"""
 
