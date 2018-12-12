@@ -117,24 +117,27 @@ class Incidents():
 
     def delete_intervention(self, type, incident_id, user):
         """deletes intervention record"""
-
-        query = "DELETE FROM incidents WHERE type = %s AND incident_id =%s;"
+        query = self.incident_fetch()
 
         conn = db_connection()
         cur = conn.cursor()
 
-        sql = self.incident_fetch()
-        cur.execute(sql, (type, incident_id,))
+        cur.execute(query, (type, incident_id,))
         intervention_data = cur.fetchone()
-        creator = intervention_data[2]
-        record_status = intervention_data[5]
 
-        if len(intervention_data) == 0:
+        if intervention_data is None:
             return {
                 "status": 404,
                 "message": "This " + type + " record does not exist"
             }, 404
 
+        # fetch creator
+        cur.execute(query, (type, incident_id,))
+        record_data = cur.fetchone()
+        creator = record_data[2]
+        record_status = record_data[5]
+
+        # check user from logged in one
         user_sql = self.check_user()
         cur.execute(user_sql, (user,))
         user_data = cur.fetchone()
@@ -153,9 +156,10 @@ class Incidents():
                 'is already ' + record_status
             }, 403
 
+        del_query = "DELETE FROM incidents WHERE type = %s AND \
+                    incident_id =%s;"
         try:
-            sql_del = "DELETE FROM incidents WHERE type = %s AND \
-            incident_id =%s;"
+            sql_del = del_query
             cur.execute(sql_del, (type, incident_id,))
             conn.commit()
             return {
@@ -170,23 +174,25 @@ class Incidents():
     def update_intervention(self, type, incident_id, user, comment):
         """updates intervention comment"""
 
-        query = "UPDATE incidents SET comment = %s WHERE type = %s AND\
-         incident_id = %s;"
+        query = self.incident_fetch()
 
         conn = db_connection()
         cur = conn.cursor()
 
-        sql = self.incident_fetch()
-        cur.execute(sql, (type, incident_id,))
+        cur.execute(query, (type, incident_id,))
         intervention_data = cur.fetchone()
-        creator = intervention_data[2]
-        record_status = intervention_data[5]
 
-        if len(intervention_data) == 0:
+        if intervention_data is None:
             return {
                 "status": 404,
                 "message": "This " + type + " record does not exist"
             }, 404
+
+        # fetch creator
+        cur.execute(query, (type, incident_id,))
+        record_data = cur.fetchone()
+        creator = record_data[2]
+        record_status = record_data[5]
 
         user_sql = self.check_user()
         cur.execute(user_sql, (user,))
@@ -206,8 +212,11 @@ class Incidents():
                 'is already ' + record_status
             }, 403
 
+        update_query = "UPDATE incidents SET comment = %s WHERE type = %s AND\
+         incident_id = %s;"
+
         try:
-            sql_update = query
+            sql_update = update_query
             cur.execute(sql_update, (comment, type, incident_id,))
             conn.commit()
             return {
@@ -221,23 +230,25 @@ class Incidents():
     def update_intervention_location(self, type, incident_id, user, location):
         """updates intervention location"""
 
-        query = "UPDATE incidents SET location = %s WHERE type = %s AND\
-         incident_id = %s;"
+        query = self.incident_fetch()
 
         conn = db_connection()
         cur = conn.cursor()
 
-        sql = self.incident_fetch()
-        cur.execute(sql, (type, incident_id,))
+        cur.execute(query, (type, incident_id,))
         intervention_data = cur.fetchone()
-        creator = intervention_data[2]
-        record_status = intervention_data[5]
 
         if intervention_data is None:
             return {
                 "status": 404,
-                'message': 'This ' + type + ' record does not exist'
+                "message": "This " + type + " record does not exist"
             }, 404
+
+        # fetch creator
+        cur.execute(query, (type, incident_id,))
+        record_data = cur.fetchone()
+        creator = record_data[2]
+        record_status = record_data[5]
 
         user_sql = self.check_user()
         cur.execute(user_sql, (user,))
@@ -258,7 +269,8 @@ class Incidents():
             }, 403
 
         try:
-            sql_update = query
+            sql_update = "UPDATE incidents SET location = %s WHERE type = %s AND\
+                            incident_id = %s;"
             cur.execute(sql_update, (location, type, incident_id,))
             conn.commit()
             return {
@@ -272,9 +284,6 @@ class Incidents():
     def update_status(self, type, incident_id, user, status):
         """updates incident status"""
 
-        query = "UPDATE incidents SET status = %s WHERE type = %s AND\
-         incident_id = %s;"
-
         conn = db_connection()
         cur = conn.cursor()
 
@@ -284,6 +293,7 @@ class Incidents():
                 "under investigation", "status": 400
                 }, 400
 
+        # check record exists
         sql = self.incident_fetch()
         cur.execute(sql, (type, incident_id,))
         intervention_data = cur.fetchone()
@@ -294,6 +304,7 @@ class Incidents():
                 "message": "This " + type + " record does not exist"
             }, 404
 
+        # check if user is admin
         user_sql = self.check_user()
         cur.execute(user_sql, (user,))
         user_data = cur.fetchone()
