@@ -19,6 +19,7 @@ def page_not_found(e):
 
 @app.errorhandler(Exception)
 def unhandled_exception(e):
+    print(e)
     return make_response(
         jsonify(
             {
@@ -40,7 +41,3 @@ def landing_page():
             }
         )
     )
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
