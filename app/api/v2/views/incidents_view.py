@@ -74,3 +74,8 @@ class IncidentViews(Resource, Incidents):
 
         return self.incidents.save_incident(created_by, record_type, location,
                                             status, comment, images, video)
+
+    def get(self, type):
+        """fetches a list of all the incident records by type"""
+
+        return self.incidents.get_all_interventions(type)

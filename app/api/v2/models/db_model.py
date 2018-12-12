@@ -5,9 +5,9 @@ class Database():
         users = """CREATE TABLE IF NOT EXISTS users(
         user_id serial PRIMARY KEY NOT NULL,
         first_name character varying(50) NOT NULL,
-        other_names character varying(50) NOT NULL,
         last_name character varying(50) NOT NULL,
-        username character varying(50) NOT NULL,
+        other_names character varying(50) NOT NULL,
+        username character varying(50) NOT NULL UNIQUE,
         email character varying(50) NOT NULL UNIQUE,
         phone_number character varying(13) NOT NULL UNIQUE,
         is_admin BOOLEAN NOT NULL DEFAULT FALSE,
@@ -21,7 +21,7 @@ class Database():
         created_on timestamp with time zone DEFAULT\
          ('now'::text):: date NOT NULL,
         created_by numeric NOT NULL,
-        type character varying(50) NOT NULL,
+        type character varying(50),
         location character varying(100) NOT NULL,
         status character varying(20),
         comment character varying(2000) NOT NULL,
@@ -31,6 +31,13 @@ class Database():
 
         self.query = [users, incidents]
         return self.query
+
+    def add_admin(self):
+        admin = """INSERT INTO users(first_name, last_name, other_names,\
+           username, email, phone_number, is_admin, password) VALUES \
+           ('admin', 'admin', 'admin', 'admin', 'admin@email.com',
+           '+244727501177', True, 'admin@123')"""
+        return admin
 
     def drop_query(self):
             drop_users = """DROP TABLE IF EXISTS users"""
