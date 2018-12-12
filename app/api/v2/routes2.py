@@ -13,3 +13,4 @@ api.add_resource(UsersView, 'auth/signup')
 api.add_resource(OneUser, 'auth/login')
 
 api.add_resource(IncidentViews, '<type>s')
+api.add_resource(OneIntervention, '<type>s/<incident_id>')
