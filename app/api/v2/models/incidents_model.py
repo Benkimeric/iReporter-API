@@ -41,3 +41,41 @@ class Incidents():
         except Exception as error:
             print(error)
             return jsonify({"message": "Error while saving Incident"})
+
+    def get_all_interventions(self, type):
+        """gets all the intervention records"""
+
+        query = "SELECT * FROM incidents WHERE type = %s;"
+
+        conn = db_connection()
+        cur = conn.cursor()
+
+        cur.execute(query, (type,))
+        incident_data = cur.fetchall()
+
+        if len(incident_data) == 0:
+            return{
+                "message": "No " + type + " records available",
+                "status": 404
+                }, 404
+
+        incidents_list = []
+        for incident in incident_data:
+            incidents_dict = {
+                "id": incident[0],
+                "created on": str(incident[1]),
+                "created by": str(incident[2]),
+                "type": incident[3],
+                "location": incident[4],
+                "status": incident[5],
+                "comment": incident[6],
+                "images": incident[7],
+                "video": incident[8]
+            }
+
+            incidents_list.append(incidents_dict)
+
+        return {
+                "status": 200,
+                "data": incidents_list
+            }, 200
