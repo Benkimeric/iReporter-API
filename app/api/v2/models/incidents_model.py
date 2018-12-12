@@ -2,6 +2,7 @@ from db_config import db_connection
 from flask import jsonify
 import psycopg2
 import os
+types_of_statuses = ["under investigation", "rejected", "resolved", "draft"]
 
 
 class Incidents():
@@ -79,3 +80,37 @@ class Incidents():
                 "status": 200,
                 "data": incidents_list
             }, 200
+
+    def get_one_incident(self, type, incident_id):
+        """gets a single intervention record"""
+
+        query = self.incident_fetch()
+
+        conn = db_connection()
+        cur = conn.cursor()
+
+        cur.execute(query, (type, incident_id,))
+        intervention_data = cur.fetchone()
+
+        if intervention_data is None:
+            return {
+                "status": 404,
+                "message": "This " + type + " record does not exist"
+            }, 404
+
+        intervention_dict = {
+            "id": intervention_data[0],
+            "create_on": str(intervention_data[1]),
+            "create_by": str(intervention_data[2]),
+            "type": intervention_data[3],
+            "location": intervention_data[4],
+            "status": intervention_data[5],
+            "comment": intervention_data[6],
+            "images": intervention_data[7],
+            "video": intervention_data[8]
+        }
+
+        return {
+            "status": 200,
+            "data": intervention_dict
+        }

@@ -75,7 +75,26 @@ class IncidentViews(Resource, Incidents):
         return self.incidents.save_incident(created_by, record_type, location,
                                             status, comment, images, video)
 
+    @jwt_required
     def get(self, type):
         """fetches a list of all the incident records by type"""
 
         return self.incidents.get_all_interventions(type)
+
+
+class OneIntervention(Resource, Incidents):
+    """class to hold methods for a single intervention records"""
+
+    def __init__(self):
+        self.incidents = Incidents()
+
+    def get(self, type, incident_id):
+        """gets a single intervention record by id"""
+
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+                }, 400
+
+        return self.incidents.get_one_incident(type, incident_id)
