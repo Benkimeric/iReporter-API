@@ -31,12 +31,13 @@ def create_tables():
 
 def create_super_admin():
     """create a default admin"""
-
-    connection = db_connection()
-    cursor = connection.cursor()
-
-    database = Database()
-    sql = database.add_admin()
-    cursor.execute(sql)
-    connection.commit()
-    cursor.close()
+    try:
+        connection = db_connection()
+        cursor = connection.cursor()
+        database = Database()
+        sql = database.add_admin()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()
+    except:
+        return 'user exists'

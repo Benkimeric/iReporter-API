@@ -4,7 +4,7 @@ sign_up_data = {
         "last_name": "Eric",
         "other_names": "Kimeu",
         "phone_number": "0727423912",
-        "user_name": "benk",
+        "user_name": "larry",
         "email": "benk@benkim.com",
         "password": "Us7cgsTsben"
 }
@@ -26,7 +26,7 @@ admin_sign_in = {
 
 # valid sign in data from valid sign up
 sign_in_data = {
-        "user_name": "benk",
+        "user_name": "larry",
         "password": "Us7cgsTsben"
 }
 

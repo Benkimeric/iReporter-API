@@ -7,7 +7,8 @@ from .data import (sign_up_data, sign_up_data_fake_email,
                    sign_up_invalid_phone, invalid_f_name,
                    invalid_l_name, invalid_o_name,
                    existing_phone, sign_in_data, invalid_username,
-                   wrong_phone, existing_email, password_data)
+                   wrong_phone, existing_email, password_data,
+                   wrong_username)
 
 
 class Registration(unittest.TestCase):
@@ -23,8 +24,8 @@ class Registration(unittest.TestCase):
     def tearDown(self):
         connection = db_connection()
         cursor = connection.cursor()
-        cursor.execute("DROP TABLE IF EXISTS users")
-        cursor.execute("DROP TABLE IF EXISTS incidents")
+        cursor.execute("DROP TABLE IF EXISTS users CASCADE")
+        cursor.execute("DROP TABLE IF EXISTS incidents CASCADE")
         connection.commit()
 
     def test_can_register(self):
@@ -219,3 +220,14 @@ class Registration(unittest.TestCase):
         self.assertEqual(result['message'], 'password min length is '
                          '8 characters, at least 1 letter and 1 number'
                          )
+
+    def test_throws_error_on_invalid_username(self):
+        """test registratiion with invalid username"""
+
+        response = self.client.post(
+            "api/v2/auth/signup",
+            data=json.dumps(wrong_username),
+            content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(result['message'], 'please enter a valid username')
