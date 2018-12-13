@@ -73,7 +73,6 @@ class IncidentViews(Resource, Incidents):
         status = "draft"
         images = []
         video = []
-
         return self.incidents.save_incident(created_by, record_type, location,
                                             status, comment, images, video)
 

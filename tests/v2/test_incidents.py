@@ -46,8 +46,8 @@ class IncidentsTests(unittest.TestCase):
     def tearDown(self):
         connection = db_connection()
         cursor = connection.cursor()
-        cursor.execute("DROP TABLE IF EXISTS users")
-        cursor.execute("DROP TABLE IF EXISTS incidents")
+        cursor.execute("DROP TABLE IF EXISTS users CASCADE")
+        cursor.execute("DROP TABLE IF EXISTS incidents CASCADE")
         connection.commit()
 
     def test_can_create_incident(self):
@@ -698,4 +698,27 @@ class IncidentsTests(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(result['message'],
                          'intervention ID hgfgf is invalid'
+                         )
+
+    def test_can_make_admin(self):
+        """test that admin can promote user to admin"""
+        response = self.client.patch('/api/v2/makeadmin/1',
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(result['message'], 'Successfully promoted user '
+                         'with ID 1 to admin'
+                         )
+
+    def test_when_id_is_invalid(self):
+        """test that cant promote nonexistent user"""
+        response = self.client.patch('/api/v2/makeadmin/333',
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(result['message'], 'This user does not exist'
                          )
