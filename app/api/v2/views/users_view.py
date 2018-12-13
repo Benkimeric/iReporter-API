@@ -3,6 +3,8 @@ from flask import jsonify, request
 from ...v2.models.users_model import Users
 from flask_restful import reqparse
 from flask_jwt_extended import create_access_token, get_jwt_identity
+from flask_jwt_extended import jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
 import re
 
 
@@ -71,13 +73,19 @@ class UsersView(Resource, Users):
             return {"message": "password min length is 8 characters, at least "
                     "1 letter and 1 number"}, 400
 
+        if not re.match(r"(^[a-zA-Z0-9]*$)", data['user_name']):
+            return {
+                "message": "please enter a valid username",
+                "status": 400
+                }, 400
+
         first_name = str(data['first_name']).lower()
         last_name = str(data['last_name']).lower()
         other_names = str(data['other_names']).lower()
         email = str(data['email']).lower()
         phone_number = data['phone_number']
         user_name = str(data['user_name']).lower()
-        password = data['password']
+        password = generate_password_hash(data['password'])
 
         return self.save_user(first_name, last_name, other_names,
                               user_name, email, phone_number, is_admin,
@@ -91,7 +99,23 @@ class OneUser(Resource, Users):
         """logs in a user to the system"""
 
         data = parser2.parse_args()
-        username = data['user_name']
+        username = str(data['user_name']).lower()
         password = data['password']
 
         return self.login_user(username, password)
+
+
+class MakeAdmin(Resource, Users):
+    """class to hold user make admin"""
+
+    @jwt_required
+    def patch(self, user_id):
+        """makes a user admin"""
+
+        if user_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': user_id + ' ID {} is invalid'.format(user_id)
+                }, 400
+
+        return self.make_admin(user_id)

@@ -1,3 +1,6 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 class Database():
     """Database class"""
 
@@ -13,14 +16,14 @@ class Database():
         is_admin BOOLEAN NOT NULL DEFAULT FALSE,
         registered timestamp with time zone DEFAULT \
         ('now'::text):: date NOT NULL,
-        password character varying(50) NOT NULL
+        password character varying(500) NOT NULL
             )"""
 
         incidents = """CREATE TABLE IF NOT EXISTS incidents(
         incident_id serial PRIMARY KEY NOT NULL,
         created_on timestamp with time zone DEFAULT\
          ('now'::text):: date NOT NULL,
-        created_by numeric NOT NULL,
+        created_by integer NOT NULL REFERENCES users(user_id),
         type character varying(50),
         location character varying(100) NOT NULL,
         status character varying(20),
@@ -32,12 +35,14 @@ class Database():
         self.query = [users, incidents]
         return self.query
 
+    admin_pass = generate_password_hash('admin@123')
+
     def add_admin(self):
-        admin = """INSERT INTO users(first_name, last_name, other_names,\
-           username, email, phone_number, is_admin, password) VALUES \
-           ('admin', 'admin', 'admin', 'admin', 'admin@email.com',
-           '+244727501177', True, 'admin@123')"""
-        return admin
+            admin = """INSERT INTO users(first_name, last_name, other_names,\
+            username, email, phone_number, is_admin, password) VALUES \
+            ('admin', 'admin', 'admin', 'admin', 'admin@email.com',
+            '0727501177', True, """ + """  '""" + generate_password_hash('admin@123') + """' """ + """)"""
+            return admin
 
     def drop_query(self):
             drop_users = """DROP TABLE IF EXISTS users"""
