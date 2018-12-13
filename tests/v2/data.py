@@ -38,6 +38,16 @@ sign_up_data_fake_email = {
         "email": "invalid",
         "password": "Us7cgsTsben"
 }
+# invalid username
+wrong_username = {
+        "first_name": "Benkim",
+        "last_name": "Eric",
+        "other_names": "Kimeu",
+        "phone_number": "0727423939",
+        "user_name": "  ",
+        "email": "benkimeu@gmail.com",
+        "password": "Us7cgsTsben"
+}
 
 # wrong phone
 sign_up_invalid_phone = {
