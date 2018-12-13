@@ -3,6 +3,7 @@ from flask import jsonify
 import psycopg2
 import os
 from flask_jwt_extended import create_access_token, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class Users():
@@ -31,7 +32,7 @@ class Users():
             return {
                 "status": 409,
                 "message": "A user with this username exists"
-                }, 409
+            }, 409
 
         email_sql = self.check_email()
         cur.execute(email_sql, (email,))
@@ -41,7 +42,7 @@ class Users():
             return {
                 "status": 409,
                 "message": "A user with this email already exists"
-                }, 409
+            }, 409
 
         phone_sql = self.check_phone()
         cur.execute(phone_sql, (phone_number,))
@@ -51,10 +52,10 @@ class Users():
             return {
                 "status": 409,
                 "message": "A user with this phone number already exists"
-                }, 409
+            }, 409
 
         try:
-            cur.execute(save_query, (first_name, last_name, other_names, 
+            cur.execute(save_query, (first_name, last_name, other_names,
                                      user_name, email, phone_number, is_admin,
                                      password))
             conn.commit()
@@ -103,14 +104,14 @@ class Users():
             return{
                 "status": 401,
                 "message": "You have entered wrong username or password"
-                }, 401
+            }, 401
 
         # check password
-        if username_data[9] != password:
+        if not check_password_hash(username_data[9], password):
             return{
                 "status": 401,
                 "message": "You have entered wrong username or password"
-                }, 401
+            }, 401
 
         id_of_user = username_data[0]
         f_name = username_data[1]
@@ -123,21 +124,62 @@ class Users():
 
         access_token = create_access_token(identity=id_of_user)
         return {
-                "status": 200,
-                "token": access_token,
-                "data": [
-                    {
-                        "token": access_token,
-                        "user ID": id_of_user,
-                        "username": u_name,
-                        "first name": f_name,
-                        "last name": l_name,
-                        "other names": o_name,
-                        "phone": phone,
-                        "email": email
-                    }
-                ]
+            "status": 200,
+            "data": [
+                {
+                    "token": access_token,
+                    "user ID": id_of_user,
+                    "username": u_name,
+                    "first name": f_name,
+                    "last name": l_name,
+                    "other names": o_name,
+                    "phone": phone,
+                    "email": email
+                }
+            ]
+        }, 200
+
+    def make_admin(self, user):
+        """makes a normal user admin"""
+        conn = db_connection()
+        cur = conn.cursor()
+
+        # fetch the user_id
+        sql = self.get_by_id()
+        cur.execute(sql, (user,))
+        data = cur.fetchone()
+        if data is None:
+            return{
+                "status": 404,
+                "message": "This user does not exist"
+            }, 404
+
+        # check if user is admin
+        user_sql = "SELECT * FROM users WHERE user_id = %s"
+        cur.execute(user_sql, (user,))
+        user_data = cur.fetchone()
+        user_role = user_data[7]
+
+        if user_role is False:
+            return {
+                "status": 403,
+                "message": "This action is only allowed to admins"
+            }, 403
+
+        try:
+            query = "UPDATE users SET is_admin = True WHERE user_id = %s"
+            # update the user
+            cur.execute(query, (user,))
+            conn.commit()
+            return {
+                "message": 'Successfully promoted user with ID {} to admin'
+                .format(user),
+                "status": 200
             }, 200
+
+        except Exception as error:
+            print(error)
+            return jsonify({"message": "Error when promoting the user"})
 
     def get_by_username(self):
         """gets registered user by their name"""
@@ -155,4 +197,10 @@ class Users():
         """fetches a user by phone number"""
 
         query = "SELECT * FROM users WHERE phone_number = %s"
+        return query
+
+    def get_by_id(self):
+        """gets registered user by their id"""
+
+        query = "SELECT * FROM users WHERE user_id = %s"
         return query
