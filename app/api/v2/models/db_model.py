@@ -41,7 +41,8 @@ class Database():
             admin = """INSERT INTO users(first_name, last_name, other_names,\
             username, email, phone_number, is_admin, password) VALUES \
             ('admin', 'admin', 'admin', 'admin', 'admin@email.com',
-            '0727501177', True, """ + """  '""" + generate_password_hash('admin@123') + """' """ + """)"""
+            '0727501177', True, """ + """  \
+            '""" + generate_password_hash('admin@123') + """' """ + """)"""
             return admin
 
     def drop_query(self):

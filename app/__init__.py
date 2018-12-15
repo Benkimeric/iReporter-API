@@ -1,6 +1,6 @@
 from flask import Flask, Blueprint
 from .api.v1.routes import version_one as v1
-from .api.v2.routes2 import version_two as v2
+from .api.v2.routes_v2 import version_two as v2
 from flask_jwt_extended import JWTManager
 from db_config import create_tables, create_super_admin
 

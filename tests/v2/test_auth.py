@@ -3,12 +3,7 @@ from flask import json
 from app.api.v2.models.db_model import Database
 from db_config import db_connection
 from app import create_app, create_tables
-from .data import (sign_up_data, sign_up_data_fake_email,
-                   sign_up_invalid_phone, invalid_f_name,
-                   invalid_l_name, invalid_o_name,
-                   existing_phone, sign_in_data, invalid_username,
-                   wrong_phone, existing_email, password_data,
-                   wrong_username)
+from .data import *
 
 
 class Registration(unittest.TestCase):
@@ -218,7 +213,8 @@ class Registration(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(400, response.status_code)
         self.assertEqual(result['message'], 'password min length is '
-                         '8 characters, at least 1 letter and 1 number'
+                         '8 characters, at least 1 letter, 1 number and a '
+                         'special character'
                          )
 
     def test_throws_error_on_invalid_username(self):
@@ -231,3 +227,14 @@ class Registration(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(400, response.status_code)
         self.assertEqual(result['message'], 'please enter a valid username')
+
+    def test_throws_error_on_no_match_passwords(self):
+        """test that cannot register with non match in passwords"""
+        response = self.client.post(
+            "api/v2/auth/signup",
+            data=json.dumps(sign_with_no_match_password),
+            content_type='application/json')
+        result = json.loads(response.data)
+        print(result)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(result['message'], 'passwords do not match')
