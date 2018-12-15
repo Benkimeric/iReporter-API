@@ -74,16 +74,12 @@ class Users():
                 "phone": new_data[6]
             }
 
-            access_token = create_access_token(identity=new_user_id)
-
             return {
                 "status": 201,
-                "data": [
+                "data":
                     {
-                        "token": access_token,
                         "user": users_dict
                     }
-                ]
             }, 201
 
         except Exception as error:
