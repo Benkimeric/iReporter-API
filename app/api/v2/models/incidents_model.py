@@ -2,6 +2,7 @@ from db_config import db_connection
 from flask import jsonify
 import psycopg2
 import os
+import smtplib
 types_of_statuses = ["under investigation", "rejected", "resolved", "draft"]
 
 
@@ -138,9 +139,7 @@ class Incidents():
         record_status = record_data[5]
 
         # check user from logged in one
-        user_sql = self.check_user()
-        cur.execute(user_sql, (user,))
-        user_data = cur.fetchone()
+        user_data = self.check_user(user)
         user_id = user_data[0]
 
         if user_id != creator:
@@ -192,11 +191,9 @@ class Incidents():
         cur.execute(query, (type, incident_id,))
         record_data = cur.fetchone()
         creator = record_data[2]
-        record_status = record_data[5]
+        record_status = record_data[2]
 
-        user_sql = self.check_user()
-        cur.execute(user_sql, (user,))
-        user_data = cur.fetchone()
+        user_data = self.check_user(user)
         user_id = user_data[0]
 
         if user_id != creator:
@@ -263,9 +260,7 @@ class Incidents():
         creator = record_data[2]
         record_status = record_data[5]
 
-        user_sql = self.check_user()
-        cur.execute(user_sql, (user,))
-        user_data = cur.fetchone()
+        user_data = self.check_user(user)
         user_id = user_data[0]
 
         if user_id != creator:
@@ -323,6 +318,9 @@ class Incidents():
         sql = self.incident_fetch()
         cur.execute(sql, (type, incident_id,))
         intervention_data = cur.fetchone()
+        creator_id = intervention_data[2]
+        creator_object = self.check_user(creator_id)
+        creator_email = creator_object[5]
 
         if intervention_data is None:
             return {
@@ -331,9 +329,7 @@ class Incidents():
             }, 404
 
         # check if user is admin
-        user_sql = self.check_user()
-        cur.execute(user_sql, (user,))
-        user_data = cur.fetchone()
+        user_data = self.check_user(user)
         user_role = user_data[7]
 
         if user_role is False:
@@ -341,12 +337,36 @@ class Incidents():
                 "status": 403,
                 "message": "This action is only allowed to admins"
             }, 403
+        # check if admin edits their own
+        if user == intervention_data[2]:
+            return {
+                "status": 403,
+                "message": "You can not change status of your own record"
+            }, 403
 
         try:
             sql_update = "UPDATE incidents SET status = %s WHERE type = %s AND\
                         incident_id = %s;"
             cur.execute(sql_update, (status, type, incident_id,))
             conn.commit()
+            # send email
+            try:
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.starttls()
+                server.login(
+                    "technologysolutions254@gmail.com", "benkimkimeueric")
+                msg = "Your {} record is now {}".format(type, status)
+                server.sendmail(
+                    "technologysolutions254@gmail.com", creator_email, msg)
+                server.quit()
+
+            except:
+                return jsonify({
+                    "status": 200,
+                    "message": "status set to {} ;could "
+                    "not send email".format(status)
+                })
+
             return {
                 "id": incident_id,
                 "message": "Updated " + type + " record status"
@@ -355,9 +375,14 @@ class Incidents():
             print(error)
             return jsonify({"message": "Error updating " + type + " status"})
 
-    def check_user(self):
+    def check_user(self, user_id):
+        conn = db_connection()
+        cur = conn.cursor()
+
         query = "SELECT * FROM users WHERE user_id = %s"
-        return query
+        cur.execute(query, (user_id,))
+        user_data = cur.fetchone()
+        return user_data
 
     def incident_fetch(self):
         """fetches type and id of an incident"""
@@ -365,3 +390,10 @@ class Incidents():
         sql = "SELECT * FROM incidents WHERE type = %s\
          and incident_id = %s;"
         return sql
+
+    def get_email(self, user_id):
+        conn = db_connection()
+        cur = conn.cursor()
+        query = "SELECT * FROM users WHERE user_id = %s"
+        cur.execute(query, (user_id,))
+        user_data = cur.fetchone()
