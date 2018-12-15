@@ -12,29 +12,32 @@ is_admin = False
 
 parser = reqparse.RequestParser(bundle_errors=True)
 parser.add_argument('first_name', type=str, required=True,
-                    help="first name cannot be left blank")
+                    help="First name field is required")
 
 parser.add_argument('last_name', type=str, required=True,
-                    help="Last name cannot be left blank")
+                    help="Last name field is required")
 parser.add_argument('other_names', type=str, required=True,
-                    help="Other name cannot be left blank")
+                    help="Other names field is required")
 
 parser.add_argument('email', type=str, required=True,
-                    help="email cannot be left blank")
+                    help="Email field is required")
 
 parser.add_argument('phone_number', type=str, required=True,
-                    help="Phone number cannot be left blank")
+                    help="Phone field is required")
 
 parser.add_argument('user_name', type=str, required=True,
-                    help="User name cannot be left blank")
+                    help="User name field is required")
 
 parser.add_argument('password', type=str, required=True,
-                    help="password cannot be left blank")
+                    help="Password field is required")
+parser.add_argument('confirm_password',
+                    help='Confirm password field is required',
+                    required=True)
 
 parser2 = reqparse.RequestParser()
-parser2.add_argument('user_name', help='This field cannot be blank',
+parser2.add_argument('user_name', help='Username field is required',
                      required=True)
-parser2.add_argument('password', help='This field cannot be blank',
+parser2.add_argument('password', help='Password field is required',
                      required=True)
 
 
@@ -45,6 +48,7 @@ class UsersView(Resource, Users):
 
     def post(self):
 
+        data = parser.parse_args()
         data = request.get_json()
 
         if data['first_name'].isalpha() is False:
@@ -68,10 +72,13 @@ class UsersView(Resource, Users):
                 " e.g 0727423XXX"
                 }, 400
 
-        if not re.match(r"(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)",
+        if not re.match(r"(^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$)",
                         data['password']):
             return {"message": "password min length is 8 characters, at least "
-                    "1 letter and 1 number"}, 400
+                    "1 letter, 1 number and a special character"}, 400
+
+        if data['password'] != data['confirm_password']:
+            return {"message": "passwords do not match", "status": 400}, 400
 
         if not re.match(r"(^[a-zA-Z0-9]*$)", data['user_name']):
             return {
@@ -115,7 +122,7 @@ class MakeAdmin(Resource, Users):
         if user_id.isdigit() is False:
             return {
                 "status": 400,
-                'message': user_id + ' ID {} is invalid'.format(user_id)
+                'message': 'ID {} is invalid'.format(user_id)
                 }, 400
 
         return self.make_admin(user_id)
