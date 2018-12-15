@@ -5,20 +5,21 @@ sign_up_data = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "benk",
-        "email": "benk@benkim.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 # valid sign in data from valid sign up
 sign_in_data = {
         "user_name": "benk",
-        "password": "Us7cgsTsben"
+        "password": "Us7cgsTsben$"
 }
 
 # sign in data with wrong username
 invalid_username = {
         "user_name": "invalid",
-        "password": "Us7cgsTsben"
+        "password": "Us7cgsTsben$"
 }
 
 # sign in data with wrong password
@@ -36,7 +37,8 @@ sign_up_data_fake_email = {
         "phone_number": "0727423939",
         "user_name": "benk",
         "email": "invalid",
-        "password": "Us7cgsTsben"
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 # invalid username
 wrong_username = {
@@ -45,8 +47,9 @@ wrong_username = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "  ",
-        "email": "benkimeu@gmail.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 # wrong phone
@@ -56,8 +59,9 @@ sign_up_invalid_phone = {
         "other_names": "Kimeu",
         "phone_number": "+5464",
         "user_name": "benk",
-        "email": "valid@gmail.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 invalid_f_name = {
@@ -66,8 +70,9 @@ invalid_f_name = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "benk",
-        "email": "valid@gmail.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 invalid_l_name = {
@@ -76,8 +81,9 @@ invalid_l_name = {
         "other_names": "Eric",
         "phone_number": "0727423939",
         "user_name": "benk",
-        "email": "valid@gmail.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 invalid_o_name = {
@@ -86,8 +92,9 @@ invalid_o_name = {
         "other_names": "#$565",
         "phone_number": "0727423939",
         "user_name": "benk",
-        "email": "valid@gmail.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 existing_phone = {
@@ -96,8 +103,9 @@ existing_phone = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "newusername",
-        "email": "newmail@benkim.com",
-        "password": "Us7cgsTsben"
+        "email": "alexkimeu1999@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 existing_email = {
@@ -106,8 +114,9 @@ existing_email = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "bena",
-        "email": "benk@benkim.com",
-        "password": "Us7cgsTsben"
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "Us7cgsTsben$"
 }
 
 password_data = {
@@ -116,6 +125,18 @@ password_data = {
         "other_names": "Kimeu",
         "phone_number": "0727423939",
         "user_name": "benk",
-        "email": "benk@benkim.com",
-        "password": "invalid"
+        "email": "benkimeric@gmail.com",
+        "password": "invalid",
+        "confirm_password": "invalid"
+}
+
+sign_with_no_match_password = {
+        "first_name": "Benkim",
+        "last_name": "Eric",
+        "other_names": "Kimeu",
+        "phone_number": "0727423939",
+        "user_name": "benk",
+        "email": "benkimeric@gmail.com",
+        "password": "Us7cgsTsben$",
+        "confirm_password": "noMatch@123Y$"
 }

@@ -191,7 +191,7 @@ class Incidents():
         cur.execute(query, (type, incident_id,))
         record_data = cur.fetchone()
         creator = record_data[2]
-        record_status = record_data[2]
+        record_status = record_data[5]
 
         user_data = self.check_user(user)
         user_id = user_data[0]
@@ -304,9 +304,19 @@ class Incidents():
 
     def update_status(self, type, incident_id, user, status):
         """updates incident status"""
+        sql = self.incident_fetch()
 
         conn = db_connection()
         cur = conn.cursor()
+
+        cur.execute(sql, (type, incident_id,))
+        intervention_data = cur.fetchone()
+
+        if intervention_data is None:
+            return {
+                "status": 404,
+                "message": "This " + type + " record does not exist"
+            }, 404
 
         if status not in map(str.lower, types_of_statuses):
             return {
@@ -314,19 +324,13 @@ class Incidents():
                 "under investigation", "status": 400
                 }, 400
 
-        # check record exists
-        sql = self.incident_fetch()
+        # check creator details
         cur.execute(sql, (type, incident_id,))
-        intervention_data = cur.fetchone()
-        creator_id = intervention_data[2]
+        record_data = cur.fetchone()
+        creator_id = record_data[2]
+
         creator_object = self.check_user(creator_id)
         creator_email = creator_object[5]
-
-        if intervention_data is None:
-            return {
-                "status": 404,
-                "message": "This " + type + " record does not exist"
-            }, 404
 
         # check if user is admin
         user_data = self.check_user(user)
@@ -338,7 +342,7 @@ class Incidents():
                 "message": "This action is only allowed to admins"
             }, 403
         # check if admin edits their own
-        if user == intervention_data[2]:
+        if user == record_data[2]:
             return {
                 "status": 403,
                 "message": "You can not change status of your own record"
@@ -368,9 +372,10 @@ class Incidents():
                 })
 
             return {
+                "status": 200,
                 "id": incident_id,
                 "message": "Updated " + type + " record status"
-            }
+            }, 200
         except Exception as error:
             print(error)
             return jsonify({"message": "Error updating " + type + " status"})

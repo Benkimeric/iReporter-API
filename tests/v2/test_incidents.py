@@ -3,13 +3,7 @@ from flask import json
 from app.api.v2.models.db_model import Database
 from db_config import db_connection, create_super_admin
 from app import create_app, create_tables
-from .incidents_data import (sign_up_data, sign_in_data, new_incident_data,
-                             invalid_comment, invalid_location, invalid_type,
-                             sign_up_data_2, edit_comment_data,
-                             edit_location_data, invalid_comment_data,
-                             invalid_location_data, admin_sign_in,
-                             admin_status_change, invalid_status
-                             )
+from .incidents_data import *
 
 
 class IncidentsTests(unittest.TestCase):
@@ -19,7 +13,6 @@ class IncidentsTests(unittest.TestCase):
         """ Define tests variables"""
 
         self.app = create_app(config_name='testing')
-        create_super_admin()
         self.client = self.app.test_client()
 
         # sign up a user
@@ -241,7 +234,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_cant_delete_others_incident(self):
         """test if a user tries to delete other persons record"""
-        # post 1 by user 1
+        # post a record by user 1
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -252,10 +245,14 @@ class IncidentsTests(unittest.TestCase):
                                     data=json.dumps(sign_up_data_2),
                                     content_type='application/json')
 
-        # get the token
-        sign_up_result = json.loads(response.data)
-        token2 = sign_up_result['data'][0]['token']
-        # delete the record
+        # login the user 2 to get the token
+        login_response = self.client.post('/api/v2/auth/login',
+                                          data=json.dumps(sign_in_data_2),
+                                          content_type='application/json')
+        login_result = json.loads(login_response.data)
+        token2 = login_result['data'][0]['token']
+
+        # delete the record by user 2
         response = self.client.delete('/api/v2/interventions/1',
                                       headers={'Authorization': 'Bearer ' +
                                                token2, 'content-type':
@@ -269,13 +266,13 @@ class IncidentsTests(unittest.TestCase):
 
     def test_can_edit_comment(self):
         """test can update a comment"""
-        # post 1
+        # post 1 record
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
-        # patch the record
+        # patch the record by the same user
         response = self.client.patch('/api/v2/interventions/1/comment',
                                      data=json.dumps(edit_comment_data),
                                      headers={'Authorization': 'Bearer ' +
@@ -290,7 +287,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_cannot_edit_others_comment(self):
         """test cant edit others comment"""
-        # post 1 by user 1
+        # post 1 record by user 1
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -301,10 +298,13 @@ class IncidentsTests(unittest.TestCase):
                                     data=json.dumps(sign_up_data_2),
                                     content_type='application/json')
 
-        # get the token
-        sign_up_result = json.loads(response.data)
-        token2 = sign_up_result['data'][0]['token']
-        # patch the record
+        # login the user 2 to get the token
+        login_response = self.client.post('/api/v2/auth/login',
+                                          data=json.dumps(sign_in_data_2),
+                                          content_type='application/json')
+        login_result = json.loads(login_response.data)
+        token2 = login_result['data'][0]['token']
+        # patch the record by user 2
         response = self.client.patch('/api/v2/interventions/1/comment',
                                      data=json.dumps(edit_comment_data),
                                      headers={'Authorization': 'Bearer ' +
@@ -350,10 +350,14 @@ class IncidentsTests(unittest.TestCase):
         response = self.client.post("api/v2/auth/signup",
                                     data=json.dumps(sign_up_data_2),
                                     content_type='application/json')
-
-        # get the token
-        sign_up_result = json.loads(response.data)
-        token2 = sign_up_result['data'][0]['token']
+        print(response.data)
+        # login the user 2 to get the token
+        login_response = self.client.post('/api/v2/auth/login',
+                                          data=json.dumps(sign_in_data_2),
+                                          content_type='application/json')
+        login_result = json.loads(login_response.data)
+        print(login_result)
+        token2 = login_result['data'][0]['token']
         # patch the record
         response = self.client.patch('/api/v2/interventions/1/location',
                                      data=json.dumps(edit_location_data),
@@ -369,7 +373,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_throws_error_on_patch_invalid_comment(self):
         """test cant edit comment with wrong data"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -391,7 +395,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_throws_error_on_patch_invalid_location(self):
         """test cant edit location with wrong data"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -429,13 +433,11 @@ class IncidentsTests(unittest.TestCase):
         # assert
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.data)
-        self.assertEqual(result['message'],
-                         'Updated intervention record status'
-                         )
+        self.assertEqual(result['status'], 200)
 
     def test_comment_cant_be_edited_by_user_after_admin_status_change(self):
         """test user can't change status after status change"""
-        # post 1
+        # post 1 by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -443,17 +445,19 @@ class IncidentsTests(unittest.TestCase):
                                   'application/json'})
 
         # admin patch
-        response = self.client.patch('/api/v2/interventions/1/status',
-                                     data=json.dumps(admin_status_change),
-                                     headers={'Authorization': 'Bearer ' +
-                                              self.admin_token, 'content-type':
-                                              'application/json'})
+        response1 = self.client.patch('/api/v2/interventions/1/status',
+                                      data=json.dumps(admin_status_change),
+                                      headers={'Authorization': 'Bearer ' +
+                                               self.admin_token,
+                                               'content-type':
+                                               'application/json'})
         # user patch
         response = self.client.patch('/api/v2/interventions/1/comment',
                                      data=json.dumps(edit_comment_data),
                                      headers={'Authorization': 'Bearer ' +
                                               self.token, 'content-type':
                                               'application/json'})
+        print(response.data)
         # assert
         self.assertEqual(response.status_code, 403)
         result = json.loads(response.data)
@@ -463,7 +467,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_location_cant_be_edited_by_user_after_admin_status_change(self):
         """test user can't change status after status change"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -491,7 +495,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_cant_delete_after_admin_status_change(self):
         """test user can't delete incident after status change"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -504,7 +508,7 @@ class IncidentsTests(unittest.TestCase):
                                      headers={'Authorization': 'Bearer ' +
                                               self.admin_token, 'content-type':
                                               'application/json'})
-        # user delete
+        # user try to delete the record
         response = self.client.delete('/api/v2/interventions/1/',
                                       headers={'Authorization': 'Bearer ' +
                                                self.token, 'content-type':
@@ -519,7 +523,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_edit_comment_on_non_digit_id(self):
         """test throws error on non digit ID"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -538,9 +542,9 @@ class IncidentsTests(unittest.TestCase):
                          'intervention ID s is invalid'
                          )
 
-    def test_edit_comment_on_non_digit_id(self):
+    def test_edit_location_on_non_digit_id(self):
         """test throws error on non digit ID"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -561,7 +565,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_returns_error_on_deleting_non_existent(self):
         """test for deleting a record which is non existent"""
-        # delete a record
+        # delete a non existent
         response = self.client.delete('/api/v2/interventions/333',
                                       headers={'Authorization': 'Bearer ' +
                                                self.token, 'content-type':
@@ -575,7 +579,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_returns_error_on_updating_non_existent_incident_comment(self):
         """test for editing record comment which is non existent"""
-        # delete a record
+        # patch non existent record
         response = self.client.patch('/api/v2/interventions/333/comment',
                                      data=json.dumps(edit_comment_data),
                                      headers={'Authorization': 'Bearer ' +
@@ -590,7 +594,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_returns_error_on_updating_non_existent_incident_location(self):
         """test for editing record comment which is non existent"""
-        # delete a record
+        # update a record not available
         response = self.client.patch('/api/v2/interventions/333/location',
                                      data=json.dumps(edit_location_data),
                                      headers={'Authorization': 'Bearer ' +
@@ -605,14 +609,14 @@ class IncidentsTests(unittest.TestCase):
 
     def test_admin_cannot_change_status_to_invalid(self):
         """test that admin cannot change status to invalid one"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
 
-        # admin patch
+        # admin try to patch the record
         response = self.client.patch('/api/v2/interventions/1/status',
                                      data=json.dumps(invalid_status),
                                      headers={'Authorization': 'Bearer ' +
@@ -639,19 +643,18 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'This intervention record does not exist'
-                         )
+                         'This intervention record does not exist')
 
     def test_non_admin_cannot_change_status(self):
         """test throws error on status change for non existent record"""
-        # post 1
+        # post 1 record by user
         self.client.post('/api/v2/interventions',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
 
-        # admin patch
+        # normal user patch
         response = self.client.patch('/api/v2/interventions/1/status',
                                      data=json.dumps(admin_status_change),
                                      headers={'Authorization': 'Bearer ' +
@@ -661,8 +664,7 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'This action is only allowed to admins'
-                         )
+                         'This action is only allowed to admins')
 
     def test_throws_error_on_patch_invalid_comment_id(self):
         """test cant edit comment with invalid id"""
@@ -682,12 +684,11 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'intervention ID fhgfhg is invalid'
-                         )
+                         'intervention ID fhgfhg is invalid')
 
     def test_throws_error_on_invalid_id_for_status(self):
         """test for invalid id entered to change status"""
-        # admin patch
+        # admin patchusing invalid ID
         response = self.client.patch('/api/v2/interventions/hgfgf/status',
                                      data=json.dumps(invalid_status),
                                      headers={'Authorization': 'Bearer ' +
@@ -697,8 +698,7 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         result = json.loads(response.data)
         self.assertEqual(result['message'],
-                         'intervention ID hgfgf is invalid'
-                         )
+                         'intervention ID hgfgf is invalid')
 
     def test_can_make_admin(self):
         """test that admin can promote user to admin"""
@@ -709,8 +709,7 @@ class IncidentsTests(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(200, response.status_code)
         self.assertEqual(result['message'], 'Successfully promoted user '
-                         'with ID 1 to admin'
-                         )
+                         'with ID 1 to admin')
 
     def test_when_id_is_invalid(self):
         """test that cant promote nonexistent user"""
@@ -722,3 +721,13 @@ class IncidentsTests(unittest.TestCase):
         self.assertEqual(404, response.status_code)
         self.assertEqual(result['message'], 'This user does not exist'
                          )
+
+    def test_when_id_is_non_digit(self):
+        """test that cant promote nonexistent user"""
+        response = self.client.patch('/api/v2/makeadmin/invalid',
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(result['message'], 'ID invalid is invalid')
