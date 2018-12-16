@@ -3,7 +3,9 @@ from flask import jsonify
 import psycopg2
 import os
 import smtplib
+import re
 types_of_statuses = ["under investigation", "rejected", "resolved", "draft"]
+types_or_record = ["red-flag", "intervention"]
 
 
 class Incidents():
