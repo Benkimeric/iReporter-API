@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import jsonify, request
 from flask_restful import reqparse
-
+from .validation import Validation
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import re
 
@@ -39,32 +39,14 @@ class IncidentViews(Resource, Incidents):
     def post(self, type):
         """saves a new incident record"""
 
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
+
         args = parser.parse_args()
-
         data = request.get_json()
-
-        type = data['record_type']
-
-        if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']
-                        ) or data['comment'].isspace():
-            return {
-                "message": "A comment cannot contain special characters e.g $ "
-                           "or empty space"
-                }, 400
-
-        if data['record_type'] not in map(str.lower, types_or_record):
-            return {
-                "message": "Record type can only be a red-flag or an "
-                "intervention", "status": 400
-                }, 400
-
-        if not re.match(
-                r"^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$",
-                data['location']
-                ):
-            return {
-                "message": "Please ensure comma separated lat and long and "
-                "within appropriate ranges", "status": 400}, 400
+        # validate input
+        if Validation(data).check_incident_data():
+            return Validation(data).check_incident_data()
 
         created_by = get_jwt_identity()
         record_type = data['record_type']
@@ -80,6 +62,9 @@ class IncidentViews(Resource, Incidents):
     def get(self, type):
         """fetches a list of all the incident records by type"""
 
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
+
         return self.incidents.get_all_interventions(type)
 
 
@@ -93,6 +78,9 @@ class OneIntervention(Resource, Incidents):
     def get(self, type, incident_id):
         """gets a single intervention record by id"""
 
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
+
         if incident_id.isdigit() is False:
             return {
                 "status": 400,
@@ -104,6 +92,9 @@ class OneIntervention(Resource, Incidents):
     @jwt_required
     def delete(self, type, incident_id):
         """deletes existing intervention record"""
+
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
 
         if incident_id.isdigit() is False:
             return {
@@ -133,6 +124,9 @@ class EditComment(Resource, Incidents):
     @jwt_required
     def patch(self, type, incident_id):
         """updates incident record comment"""
+
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
 
         if incident_id.isdigit() is False:
             return {
@@ -176,6 +170,9 @@ class EditLocation(Resource, Incidents):
     @jwt_required
     def patch(self, type, incident_id):
         """updates incident record location"""
+
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
 
         if incident_id.isdigit() is False:
             return {
@@ -221,6 +218,9 @@ class ChangeStatus(Resource, Incidents):
     @jwt_required
     def patch(self, type, incident_id):
         """updates incident record status"""
+
+        if Validation(type).validate_type(type):
+            return Validation(type).validate_type(type)
 
         if incident_id.isdigit() is False:
             return {
