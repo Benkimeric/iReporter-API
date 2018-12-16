@@ -143,6 +143,7 @@ class EditComment(Resource, Incidents):
         if not re.match(r"^[a-zA-Z0-9 \"!?.,-]+$", data['comment']
                         ) or data['comment'].isspace():
             return {
+                "status": 400,
                 "message": "A comment cannot contain special characters e.g $ "
                            "or empty space"
                 }, 400

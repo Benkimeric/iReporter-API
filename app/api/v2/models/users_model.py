@@ -66,6 +66,7 @@ class Users():
 
             new_user_id = new_data[0]
             users_dict = {
+                "user id": new_data[0],
                 "first name": new_data[1],
                 "last name": new_data[2],
                 "other names": new_data[3],
@@ -135,7 +136,7 @@ class Users():
             ]
         }, 200
 
-    def make_admin(self, user):
+    def make_admin(self, user, logged_user):
         """makes a normal user admin"""
         conn = db_connection()
         cur = conn.cursor()
@@ -152,7 +153,7 @@ class Users():
 
         # check if user is admin
         user_sql = "SELECT * FROM users WHERE user_id = %s"
-        cur.execute(user_sql, (user,))
+        cur.execute(user_sql, (logged_user,))
         user_data = cur.fetchone()
         user_role = user_data[7]
 

@@ -124,5 +124,5 @@ class MakeAdmin(Resource, Users):
                 "status": 400,
                 'message': 'ID {} is invalid'.format(user_id)
                 }, 400
-
-        return self.make_admin(user_id)
+        logged_user = get_jwt_identity()
+        return self.make_admin(user_id, logged_user)
