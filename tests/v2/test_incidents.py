@@ -37,6 +37,7 @@ class IncidentsTests(unittest.TestCase):
         self.admin_token = self.admin_result['data'][0]['token']
 
     def tearDown(self):
+        """to destroy tabbles after each test"""
         connection = db_connection()
         cursor = connection.cursor()
         cursor.execute("DROP TABLE IF EXISTS users CASCADE")
@@ -101,19 +102,19 @@ class IncidentsTests(unittest.TestCase):
 
     def test_gets_all_incidents(self):
         """test that can fetch all the incident records"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
-        # post 2
+        # post 2nd incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
-        # fetch
+        # fetch all
         response = self.client.get('/api/v2/intervention',
                                    headers={'Authorization': 'Bearer ' +
                                             self.token, 'content-type':
@@ -123,7 +124,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_getting_empty_list(self):
         """test that can return message on empty list"""
-        # fetch empty
+        # fetch empty database
         response = self.client.get('/api/v2/intervention',
                                    headers={'Authorization': 'Bearer ' +
                                             self.token, 'content-type':
@@ -136,13 +137,13 @@ class IncidentsTests(unittest.TestCase):
 
     def test_gets_a_single(self):
         """test that can fetch a single the incident record"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
                                   self.token, 'content-type':
                                   'application/json'})
-        # post 2
+        # post 2nd incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -161,7 +162,7 @@ class IncidentsTests(unittest.TestCase):
     def test_get_incident_by_a_non_digit_id(self):
         """test returns message when incident id is not digit"""
 
-        # fetch
+        # fetch using non digit id
         response = self.client.get('/api/v2/intervention/fhgfhg',
                                    headers={'Authorization': 'Bearer ' +
                                             self.token, 'content-type':
@@ -174,7 +175,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_get_non_existent_record(self):
         """test returns message if record doesnt exist"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -194,7 +195,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_deletes_a_record(self):
         """test can delete a record"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -214,7 +215,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_gives_error_on_wrong_input_for_id_on_delete(self):
         """test it gives an error on entering a non digit id"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -319,7 +320,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_can_edit_location(self):
         """test can update a location"""
-        # post 1
+        # post 1 incident record
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -417,7 +418,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_admin_can_change_status(self):
         """test that admin can change status"""
-        # post 1
+        # post 1 incident
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -668,7 +669,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_throws_error_on_patch_invalid_comment_id(self):
         """test cant edit comment with invalid id"""
-        # post 1
+        # post 1 incident record
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -792,7 +793,7 @@ class IncidentsTests(unittest.TestCase):
 
     def test_change_status_with_invalid_url(self):
         """test that admin can't change change status with invalid url"""
-        # post 1
+        # post 1 incident record
         self.client.post('/api/v2/intervention',
                          data=json.dumps(new_incident_data),
                          headers={'Authorization': 'Bearer ' +
@@ -818,5 +819,5 @@ class IncidentsTests(unittest.TestCase):
                                                self.token, 'content-type':
                                                'application/json'})
         result = json.loads(response.data)
-        # self.assertEqual(result['status'], 400)
+        self.assertEqual(result['status'], 400)
         self.assertEqual(response.status_code, 400)

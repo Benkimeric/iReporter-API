@@ -17,6 +17,7 @@ class Registration(unittest.TestCase):
         self.client = self.app.test_client()
 
     def tearDown(self):
+        """teardown method to clear database"""
         connection = db_connection()
         cursor = connection.cursor()
         cursor.execute("DROP TABLE IF EXISTS users CASCADE")
@@ -24,6 +25,7 @@ class Registration(unittest.TestCase):
         connection.commit()
 
     def test_can_register(self):
+        """test if can create a new user"""
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(sign_up_data),
@@ -92,12 +94,12 @@ class Registration(unittest.TestCase):
     def test_throws_error_duplicate_username(self):
         """test with existing username"""
 
-        # post
+        # signup user
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(sign_up_data),
             content_type='application/json')
-        # post 2
+        # signup user again
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(sign_up_data),
@@ -109,14 +111,14 @@ class Registration(unittest.TestCase):
             result['message'], 'A user with this username exists')
 
     def test_throws_error_on_existing_phone(self):
-        """test with existing username"""
+        """test with existing phone number"""
 
-        # post
+        # signup user 1
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(sign_up_data),
             content_type='application/json')
-        # post 2
+        # signup user 2
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(existing_phone),
@@ -130,12 +132,12 @@ class Registration(unittest.TestCase):
     def test_throws_error_on_existing_email(self):
         """test with existing username"""
 
-        # post
+        # signup user 1
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(sign_up_data),
             content_type='application/json')
-        # post 2
+        # signup user 2
         response = self.client.post(
             "api/v2/auth/signup",
             data=json.dumps(existing_email),

@@ -165,7 +165,8 @@ class Incidents():
             conn.commit()
             return {
                 "id": incident_id,
-                "message": type + " has been deleted"
+                "message": type + " has been deleted",
+                "status": 200
             }, 200
 
         except Exception as error:
@@ -232,6 +233,7 @@ class Incidents():
             }
             return {
                 "id": incident_id,
+                "status": 200,
                 "message": "Updated " + type + " records comment",
                 "data": incident_dict
             }, 200
@@ -297,6 +299,7 @@ class Incidents():
             }
             return {
                 "id": incident_id,
+                "status": 200,
                 'message': 'Updated ' + type + ' records location',
                 "data": incident_dict
             }
