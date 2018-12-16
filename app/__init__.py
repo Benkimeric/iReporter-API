@@ -35,7 +35,8 @@ def create_app(config_name):
         return make_response(
             jsonify(
                 {
-                    "message": "iReporter Server error. Please contact the admin",
+                    "message": "iReporter Server error. "
+                    "Please contact the admin",
                     "status": 500
                 }
             ), 500

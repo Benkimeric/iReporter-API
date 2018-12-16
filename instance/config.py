@@ -19,7 +19,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
     TESTING = False
-    DATABASE_URL = "postgres://szjgiekrolovoc:a68f2b6ca11a48ac9eb8347eb2d9fad9b378aad66611b09cc728dc56f3ec3b72@ec2-54-247-102-1.eu-west-1.compute.amazonaws.com:5432/dd8qlehec47quf"
+    DATABASE_URL = "postgres://vmumuasubnpcpq:0710f7d02383e1835620eedc4e939fc644d712d5a48923e20dbf2ee17d440214@ec2-54-243-150-10.compute-1.amazonaws.com:5432/d359hbd00asc7a"
 
 
 class TestingConfig(Config):
