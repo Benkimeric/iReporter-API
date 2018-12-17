@@ -359,14 +359,18 @@ class Incidents():
             cur.execute(sql_update, (status, type, incident_id,))
             conn.commit()
             # send email
+            FROM = "technologysolutions254@gmail.com"
+            TO = creator_email
+            SUBJECT = "Incident Record Status changed"
+            MESSAGE = "Your {} record is now {}".format(type, status)
             try:
                 server = smtplib.SMTP('smtp.gmail.com', 587)
                 server.starttls()
                 server.login(
                     "technologysolutions254@gmail.com", "benkimkimeueric")
-                msg = "Your {} record is now {}".format(type, status)
-                server.sendmail(
-                    "technologysolutions254@gmail.com", creator_email, msg)
+                msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
+                """ % (FROM, ", ".join(TO), SUBJECT, MESSAGE)
+                server.sendmail(FROM, TO, msg)
                 server.quit()
 
             except:
