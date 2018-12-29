@@ -131,7 +131,8 @@ class Users():
                     "last name": l_name,
                     "other names": o_name,
                     "phone": phone,
-                    "email": email
+                    "email": email,
+                    "admin": admin
                 }
             ]
         }, 200
