@@ -4,6 +4,7 @@ from flask_restful import reqparse
 from .validation import Validation
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import re
+from .record_views import *
 
 from ..models.incidents_model import Incidents
 
@@ -85,7 +86,7 @@ class OneIntervention(Resource, Incidents):
             return {
                 "status": 400,
                 'message': type + ' ID {} is invalid'.format(incident_id)
-                }, 400
+            }, 400
 
         return self.incidents.get_one_incident(type, incident_id)
 
@@ -100,17 +101,18 @@ class OneIntervention(Resource, Incidents):
             return {
                 "status": 400,
                 'message': type + ' ID {} is invalid'.format(incident_id)
-                }, 400
+            }, 400
 
         user = get_jwt_identity()
         return self.incidents.delete_intervention(type, incident_id, user)
 
+
 parser_patch_c = reqparse.RequestParser(bundle_errors=True)
 parser_patch_c.add_argument(
-        'comment', type=str,
-        required=True,
-        help="Comment cannot be left blank"
-    )
+    'comment', type=str,
+    required=True,
+    help="Comment cannot be left blank"
+)
 
 
 class EditComment(Resource, Incidents):
@@ -132,7 +134,7 @@ class EditComment(Resource, Incidents):
             return {
                 "status": 400,
                 'message': type + ' ID {} is invalid'.format(incident_id)
-                }, 400
+            }, 400
 
         args = parser_patch_c.parse_args()
         data = request.get_json()
@@ -146,7 +148,7 @@ class EditComment(Resource, Incidents):
                 "status": 400,
                 "message": "A comment cannot contain special characters e.g $ "
                            "or empty space"
-                }, 400
+            }, 400
 
         return self.incidents.update_intervention(
             type, incident_id, user, comment)
@@ -154,19 +156,19 @@ class EditComment(Resource, Incidents):
 
 parser_patch_l = reqparse.RequestParser(bundle_errors=True)
 parser_patch_l.add_argument(
-        'location', type=str,
-        required=True,
-        help="Location cannot be left blank"
-    )
+    'location', type=str,
+    required=True,
+    help="Location cannot be left blank"
+)
 
 
-class EditLocation(Resource, Incidents):
+class EditLocation(Resource, Incidents2):
     """contains method to edit an incident record"""
 
     def __init__(self):
         """Initialises the editlocation class"""
 
-        self.incidents = Incidents()
+        self.incidents = Incidents2()
 
     @jwt_required
     def patch(self, type, incident_id):
@@ -179,7 +181,7 @@ class EditLocation(Resource, Incidents):
             return {
                 "status": 400,
                 'message': type + ' ID {} is invalid'.format(incident_id)
-                }, 400
+            }, 400
 
         args = parser_patch_l.parse_args()
         data = request.get_json()
@@ -190,7 +192,7 @@ class EditLocation(Resource, Incidents):
         if not re.match(
                 r"^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$",
                 location
-                ):
+        ):
             return {
                 "message": "Please ensure comma separated lat and long and "
                 "within appropriate ranges", "status": 400}, 400
@@ -201,19 +203,19 @@ class EditLocation(Resource, Incidents):
 
 parser_patch_s = reqparse.RequestParser(bundle_errors=True)
 parser_patch_s.add_argument(
-        'status', type=str,
-        required=True,
-        help="Status cannot be left blank"
-    )
+    'status', type=str,
+    required=True,
+    help="Status cannot be left blank"
+)
 
 
-class ChangeStatus(Resource, Incidents):
+class ChangeStatus(Resource, Incidents2):
     """contains method to edit an incident record"""
 
     def __init__(self):
         """Initialises the ChangeInterStatus class"""
 
-        self.incidents = Incidents()
+        self.incidents = Incidents2()
 
     # only for admins
     @jwt_required
@@ -227,7 +229,7 @@ class ChangeStatus(Resource, Incidents):
             return {
                 "status": 400,
                 'message': type + ' ID {} is invalid'.format(incident_id)
-                }, 400
+            }, 400
 
         args = parser_patch_s.parse_args()
         data = request.get_json()
