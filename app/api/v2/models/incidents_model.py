@@ -241,3 +241,19 @@ class Incidents():
         except Exception as error:
             print(error)
             return jsonify({'message': 'Error updating ' + type + ' comment'})
+
+    def incident_fetch(self):
+        """fetches type and id of an incident"""
+
+        sql = "SELECT * FROM incidents WHERE type = %s\
+         and incident_id = %s;"
+        return sql
+
+    def check_user(self, user_id):
+        conn = db_connection()
+        cur = conn.cursor()
+
+        query = "SELECT * FROM users WHERE user_id = %s"
+        cur.execute(query, (user_id,))
+        user_data = cur.fetchone()
+        return user_data
