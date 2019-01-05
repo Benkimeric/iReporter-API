@@ -29,13 +29,11 @@ class IncidentsCount(Resource, Incidents2):
         self.incidents = Incidents2()
 
     @jwt_required
-    def get(self, type):
+    def get(self, type, status):
         """fetches a count of incident records by a specific user"""
 
         if Validation(type).validate_type(type):
             return Validation(type).validate_type(type)
         user = get_jwt_identity()
 
-        data = request.get_json()
-        status = data['status']
         return self.incidents.count_incidents(user, type, status)
