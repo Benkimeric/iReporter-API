@@ -1,5 +1,6 @@
 
-from ..v2.views.users_view import UsersView, OneUser, MakeAdmin
+from ..v2.views.users_view import UsersView, OneUser, MakeAdmin, ViewAllUsers,\
+    ViewOneUser
 from ..v2.views.incidents_view import IncidentViews, OneIntervention,\
     EditComment, EditLocation, ChangeStatus, UserIncidents, IncidentsCount
 from flask_restful import Api, Resource
@@ -12,6 +13,8 @@ api = Api(version_two)
 api.add_resource(UsersView, 'auth/signup')
 api.add_resource(OneUser, 'auth/login')
 api.add_resource(MakeAdmin, 'makeadmin/<user_id>')
+api.add_resource(ViewAllUsers, 'users')
+api.add_resource(ViewOneUser, 'users/<user_id>')
 
 api.add_resource(IncidentViews, '<type>')
 api.add_resource(OneIntervention, '<type>/<incident_id>')
