@@ -14,7 +14,7 @@ api.add_resource(UsersView, 'auth/signup')
 api.add_resource(OneUser, 'auth/login')
 api.add_resource(MakeAdmin, 'makeadmin/<user_id>')
 api.add_resource(ViewAllUsers, 'users')
-api.add_resource(ViewOneUser, 'users/<user_id>')
+api.add_resource(ViewOneUser, 'users/profile')
 
 api.add_resource(IncidentViews, '<type>')
 api.add_resource(OneIntervention, '<type>/<incident_id>')

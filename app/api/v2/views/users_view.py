@@ -142,7 +142,7 @@ class ViewOneUser(Resource, Users):
     """class to hold view single user method"""
 
     @jwt_required
-    def get(self, user_id):
+    def get(self):
         """view single user"""
-
+        user_id = get_jwt_identity()
         return self.view_one_user(user_id)
