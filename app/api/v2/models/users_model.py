@@ -202,3 +202,44 @@ class Users():
 
         query = "SELECT * FROM users WHERE user_id = %s"
         return query
+
+    def view_users(self):
+        sql = "SELECT * FROM users"
+        conn = db_connection()
+        cur = conn.cursor()
+        cur.execute(sql)
+        users_data = cur.fetchall()
+        if users_data is None:
+            return {
+                "status": 404, "message": "There are no registered users"
+            }, 404
+        users_list = []
+        for user in users_data:
+            users_dict = self.user_dict(user)
+            users_list.append(users_dict)
+        return {
+            "status": 200, "data": users_list
+        }, 200
+
+    def view_one_user(self, user):
+        query = self.get_by_id()
+        conn = db_connection()
+        cur = conn.cursor()
+        cur.execute(query, (user,))
+        user_data = cur.fetchone()
+        if user_data is None:
+            return {
+                "status": 404, "message": "This user does not exist"
+            }, 404
+        return {
+            "status": 200, "data": self.user_dict(user_data)
+        }, 200
+
+    def user_dict(self, user_data):
+        user_dict = {
+            "id": user_data[0], "first_name": str(user_data[1]),
+            "last_name": str(user_data[2]), "other_names": user_data[3],
+            "user_name": user_data[4], "email": user_data[5],
+            "phone": user_data[6], "is_admin": user_data[7]
+        }
+        return user_dict
