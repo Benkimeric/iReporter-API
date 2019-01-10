@@ -43,6 +43,11 @@ Python / Flask
 | DELETE     | /api/v2/intervention/incident_id       | Delete a single intervention by id     |
 | PATCH     | /api/v2/ intervention/incident_id/comment     | Edit a intervention comment by ID    |
 | PATCH     | /api/v2/ intervention/incident_id/location     | Edit a intervention location by ID    |
+| PATCH     | /api/v2/makeadmin/user_id        | Promote a user to an admin by their ID      |
+| GET     | /api/v2/users/        | View all the registered users      |
+| GET     | /api/v2/users/user_id        | View details of a registered user      |
+| GET     | /api/v2/user/red-flag/        | View all red-flags by a certain user      |
+| GET     | /api/v2/user/intervention/        | View all interventions by a certain user      |
 
 ### Installation Procedure
 download and install python3

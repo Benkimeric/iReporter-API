@@ -126,3 +126,23 @@ class MakeAdmin(Resource, Users):
                 }, 400
         logged_user = get_jwt_identity()
         return self.make_admin(user_id, logged_user)
+
+
+class ViewAllUsers(Resource, Users):
+    """class to hold view users method"""
+
+    @jwt_required
+    def get(self):
+        """view all users"""
+
+        return self.view_users()
+
+
+class ViewOneUser(Resource, Users):
+    """class to hold view single user method"""
+
+    @jwt_required
+    def get(self, user_id):
+        """view single user"""
+
+        return self.view_one_user(user_id)
