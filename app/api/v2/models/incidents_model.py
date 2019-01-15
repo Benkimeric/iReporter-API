@@ -27,25 +27,21 @@ class Incidents():
         conn = db_connection()
         cur = conn.cursor()
 
-        try:
-            cur.execute(query, (
-                created_by, record_type, location, status, comment,
-                images, video
-                ))
-            new_record = cur.fetchone()
-            conn.commit()
-            return {
-                "status": 201,
-                "data": [
-                    {
-                        "message": "Created " + record_type + " record",
-                        "id": new_record[0]
-                    }
-                ]
-            }, 201
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error while saving Incident"})
+        cur.execute(query, (
+            created_by, record_type, location, status, comment,
+            images, video
+            ))
+        new_record = cur.fetchone()
+        conn.commit()
+        return {
+            "status": 201,
+            "data": [
+                {
+                    "message": "Created " + record_type + " record",
+                    "id": new_record[0]
+                }
+            ]
+        }, 201
 
     def get_all_interventions(self, type):
         """gets all the intervention records"""
@@ -160,19 +156,15 @@ class Incidents():
 
         del_query = "DELETE FROM incidents WHERE type = %s AND \
                     incident_id =%s;"
-        try:
-            sql_del = del_query
-            cur.execute(sql_del, (type, incident_id,))
-            conn.commit()
-            return {
-                "id": incident_id,
-                "message": type + " has been deleted",
-                "status": 200
-            }, 200
 
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error while deleting record"})
+        sql_del = del_query
+        cur.execute(sql_del, (type, incident_id,))
+        conn.commit()
+        return {
+            "id": incident_id,
+            "message": type + " has been deleted",
+            "status": 200
+        }, 200
 
     def update_intervention(self, type, incident_id, user, comment):
         """updates intervention comment"""
@@ -216,31 +208,27 @@ class Incidents():
         update_query = "UPDATE incidents SET comment = %s WHERE type = %s AND\
          incident_id = %s;"
 
-        try:
-            sql_update = update_query
-            cur.execute(sql_update, (comment, type, incident_id,))
-            conn.commit()
-            # updated record
-            sql = self.incident_fetch()
-            cur.execute(sql, (type, incident_id,))
-            updated_data = cur.fetchone()
+        sql_update = update_query
+        cur.execute(sql_update, (comment, type, incident_id,))
+        conn.commit()
+        # updated record
+        sql = self.incident_fetch()
+        cur.execute(sql, (type, incident_id,))
+        updated_data = cur.fetchone()
 
-            incident_dict = {
-                "created by": str(updated_data[2]),
-                "type": updated_data[3],
-                "location": updated_data[4],
-                "status": updated_data[5],
-                "comment": updated_data[6]
-            }
-            return {
-                "id": incident_id,
-                "status": 200,
-                "message": "Updated " + type + " records comment",
-                "data": incident_dict
-            }, 200
-        except Exception as error:
-            print(error)
-            return jsonify({'message': 'Error updating ' + type + ' comment'})
+        incident_dict = {
+            "created by": str(updated_data[2]),
+            "type": updated_data[3],
+            "location": updated_data[4],
+            "status": updated_data[5],
+            "comment": updated_data[6]
+        }
+        return {
+            "id": incident_id,
+            "status": 200,
+            "message": "Updated " + type + " records comment",
+            "data": incident_dict
+        }, 200
 
     def incident_fetch(self):
         """fetches type and id of an incident"""
