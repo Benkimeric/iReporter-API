@@ -40,3 +40,11 @@ class Validation():
                 "red-flag or intervention",
                 "status": 400
                 }, 400
+
+    def validate_incident_id(self, incident_id):
+        """checks a valid incident ID"""
+        if incident_id.isdigit() is False:
+            return {
+                "status": 400,
+                'message': type + ' ID {} is invalid'.format(incident_id)
+            }, 400

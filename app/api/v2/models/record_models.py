@@ -111,32 +111,28 @@ class Incidents2():
                 'is already ' + record_status
             }, 403
 
-        try:
-            sql_update = "UPDATE incidents SET location = %s WHERE type = %s AND\
-                            incident_id = %s;"
-            cur.execute(sql_update, (location, type, incident_id,))
-            conn.commit()
-            # updated record
-            sql = self.incident_fetch()
-            cur.execute(sql, (type, incident_id,))
-            updated_data = cur.fetchone()
+        sql_update = "UPDATE incidents SET location = %s WHERE type = %s AND\
+                        incident_id = %s;"
+        cur.execute(sql_update, (location, type, incident_id,))
+        conn.commit()
+        # updated record
+        sql = self.incident_fetch()
+        cur.execute(sql, (type, incident_id,))
+        updated_data = cur.fetchone()
 
-            incident_dict = {
-                "created by": str(updated_data[2]),
-                "type": updated_data[3],
-                "location": updated_data[4],
-                "status": updated_data[5],
-                "comment": updated_data[6]
-            }
-            return {
-                "id": incident_id,
-                "status": 200,
-                'message': 'Updated ' + type + ' records location',
-                "data": incident_dict
-            }
-        except Exception as error:
-            print(error)
-            return jsonify({'message': 'Error updating ' + type + ' location'})
+        incident_dict = {
+            "created by": str(updated_data[2]),
+            "type": updated_data[3],
+            "location": updated_data[4],
+            "status": updated_data[5],
+            "comment": updated_data[6]
+        }
+        return {
+            "id": incident_id,
+            "status": 200,
+            'message': 'Updated ' + type + ' records location',
+            "data": incident_dict
+        }
 
     def update_status(self, type, incident_id, user, status):
         """updates incident status"""
@@ -184,41 +180,37 @@ class Incidents2():
                 "message": "You can not change status of your own record"
             }, 403
 
+        sql_update = "UPDATE incidents SET status = %s WHERE type = %s AND\
+                    incident_id = %s;"
+        cur.execute(sql_update, (status, type, incident_id,))
+        conn.commit()
+        # send email
+        FROM = "technologysolutions254@gmail.com"
+        TO = creator_email
+        SUBJECT = "Incident Record Status changed"
+        MESSAGE = "Your {} record is now {}".format(type, status)
         try:
-            sql_update = "UPDATE incidents SET status = %s WHERE type = %s AND\
-                        incident_id = %s;"
-            cur.execute(sql_update, (status, type, incident_id,))
-            conn.commit()
-            # send email
-            FROM = "technologysolutions254@gmail.com"
-            TO = creator_email
-            SUBJECT = "Incident Record Status changed"
-            MESSAGE = "Your {} record is now {}".format(type, status)
-            try:
-                server = smtplib.SMTP('smtp.gmail.com', 587)
-                server.starttls()
-                server.login(
-                    "technologysolutions254@gmail.com", "benkimkimeueric")
-                msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
-                """ % (FROM, ", ".join(TO), SUBJECT, MESSAGE)
-                server.sendmail(FROM, TO, msg)
-                server.quit()
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(
+                "technologysolutions254@gmail.com", "benkimkimeueric")
+            msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
+            """ % (FROM, ", ".join(TO), SUBJECT, MESSAGE)
+            server.sendmail(FROM, TO, msg)
+            server.quit()
 
-            except:
-                return jsonify({
-                    "status": 200,
-                    "message": "status set to {} ;could "
-                    "not send email".format(status)
-                })
-
-            return {
+        except:
+            return jsonify({
                 "status": 200,
-                "id": incident_id,
-                "message": "Updated " + type + " record status"
-            }, 200
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error updating " + type + " status"})
+                "message": "status set to {} ;could "
+                "not send email".format(status)
+            })
+
+        return {
+            "status": 200,
+            "id": incident_id,
+            "message": "Updated " + type + " record status"
+        }, 200
 
     def check_user(self, user_id):
         conn = db_connection()

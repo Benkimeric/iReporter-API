@@ -54,38 +54,33 @@ class Users():
                 "message": "A user with this phone number already exists"
             }, 409
 
-        try:
-            cur.execute(save_query, (first_name, last_name, other_names,
-                                     user_name, email, phone_number, is_admin,
-                                     password))
-            conn.commit()
-            # get saved user
-            u_name_sql = self.get_by_username()
-            cur.execute(u_name_sql, (user_name,))
-            new_data = cur.fetchone()
+        cur.execute(save_query, (first_name, last_name, other_names,
+                                 user_name, email, phone_number, is_admin,
+                                 password))
+        conn.commit()
+        # get saved user
+        u_name_sql = self.get_by_username()
+        cur.execute(u_name_sql, (user_name,))
+        new_data = cur.fetchone()
 
-            new_user_id = new_data[0]
-            users_dict = {
-                "user id": new_data[0],
-                "first name": new_data[1],
-                "last name": new_data[2],
-                "other names": new_data[3],
-                "user name": new_data[4],
-                "email": new_data[5],
-                "phone": new_data[6]
-            }
+        new_user_id = new_data[0]
+        users_dict = {
+            "user id": new_data[0],
+            "first name": new_data[1],
+            "last name": new_data[2],
+            "other names": new_data[3],
+            "user name": new_data[4],
+            "email": new_data[5],
+            "phone": new_data[6]
+        }
 
-            return {
-                "status": 201,
-                "data":
-                    {
-                        "user": users_dict
-                    }
-            }, 201
-
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error when saving user"})
+        return {
+            "status": 201,
+            "data":
+                {
+                    "user": users_dict
+                }
+        }, 201
 
     def login_user(self, username, password):
         """logs in user to the system"""
@@ -164,20 +159,15 @@ class Users():
                 "message": "This action is only allowed to admins"
             }, 403
 
-        try:
-            query = "UPDATE users SET is_admin = True WHERE user_id = %s"
-            # update the user
-            cur.execute(query, (user,))
-            conn.commit()
-            return {
-                "message": 'Successfully promoted user with ID {} to admin'
-                .format(user),
-                "status": 200
-            }, 200
-
-        except Exception as error:
-            print(error)
-            return jsonify({"message": "Error when promoting the user"})
+        query = "UPDATE users SET is_admin = True WHERE user_id = %s"
+        # update the user
+        cur.execute(query, (user,))
+        conn.commit()
+        return {
+            "message": 'Successfully promoted user with ID {} to admin'
+            .format(user),
+            "status": 200
+        }, 200
 
     def get_by_username(self):
         """gets registered user by their name"""
@@ -227,10 +217,6 @@ class Users():
         cur = conn.cursor()
         cur.execute(query, (user,))
         user_data = cur.fetchone()
-        if user_data is None:
-            return {
-                "status": 404, "message": "This user does not exist"
-            }, 404
         return {
             "status": 200, "data": self.user_dict(user_data)
         }, 200
