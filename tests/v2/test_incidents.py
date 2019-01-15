@@ -821,3 +821,96 @@ class IncidentsTests(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(result['status'], 400)
         self.assertEqual(response.status_code, 400)
+
+    def test_make_admin_normal_user(self):
+        """test that normal user cannot promote another user"""
+        response = self.client.patch('/api/v2/makeadmin/1',
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.token, 'content-type':
+                                              'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(result['message'],
+                         'This action is only allowed to admins')
+
+    def test_gets_all_users(self):
+        """test that can fetch all the user records"""
+        self.client.post(
+            "api/v2/auth/signup",
+            data=json.dumps(sign_up_data),
+            content_type='application/json')
+        # fetch
+        response = self.client.get('/api/v2/users',
+                                   headers={'Authorization': 'Bearer ' +
+                                            self.admin_token, 'content-type':
+                                            'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 200)
+        self.assertEqual(response.status_code, 200)
+
+    def test_gets_users_one(self):
+        """test that can fetch all the user records"""
+        # fetch
+        response = self.client.get('/api/v2/users/profile',
+                                   headers={'Authorization': 'Bearer ' +
+                                            self.admin_token, 'content-type':
+                                            'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 200)
+        self.assertEqual(response.status_code, 200)
+
+    def test_count(self):
+        """test can return record count"""
+        response = self.client.get('/api/v2/user/red-flag/draft',
+                                   headers={'Authorization': 'Bearer ' +
+                                            self.admin_token, 'content-type':
+                                            'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 200)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_empty_user_records(self):
+        """test getting user records"""
+        response = self.client.get('/api/v2/user/red-flag',
+                                   headers={'Authorization': 'Bearer ' +
+                                            self.admin_token, 'content-type':
+                                            'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 404)
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_user_records(self):
+        """test getting user records"""
+        self.client.post('/api/v2/intervention',
+                         data=json.dumps(new_incident_data),
+                         headers={'Authorization': 'Bearer ' +
+                                  self.admin_token, 'content-type':
+                                  'application/json'})
+
+        response = self.client.get('/api/v2/user/intervention',
+                                   headers={'Authorization': 'Bearer ' +
+                                            self.admin_token, 'content-type':
+                                            'application/json'})
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 200)
+        self.assertEqual(response.status_code, 200)
+
+    def test_admin_cant_change_own_record_status(self):
+        """test that admin can change status"""
+        # post 1 incident
+        self.client.post('/api/v2/intervention',
+                         data=json.dumps(new_incident_data),
+                         headers={'Authorization': 'Bearer ' +
+                                  self.admin_token, 'content-type':
+                                  'application/json'})
+
+        # admin patch
+        response = self.client.patch('/api/v2/intervention/1/status',
+                                     data=json.dumps(admin_status_change),
+                                     headers={'Authorization': 'Bearer ' +
+                                              self.admin_token, 'content-type':
+                                              'application/json'})
+        # assert
+        self.assertEqual(response.status_code, 403)
+        result = json.loads(response.data)
+        self.assertEqual(result['status'], 403)
